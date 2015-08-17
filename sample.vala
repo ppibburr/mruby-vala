@@ -1,9 +1,3 @@
-# mruby-vala
-MRuby bindings to Vala (and with gobject-introspection, any language that supports it)
-
-Example
-===
-```vala
 using MRb;
 
 void main() {
@@ -12,5 +6,3 @@ void main() {
   mrb.load_string("puts hello()");
   mrb.close();
 }
-
-```
