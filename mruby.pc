@@ -1,0 +1,11 @@
+prefix=/home/ppibburr/git/mruby
+exec_prefix=${prefix}
+libdir=${exec_prefix}/build/host/lib
+includedir=${prefix}/include
+
+Name: libmruby
+Description: Embedded Ruby (mruby)
+Version: 1.1.0
+Libs: -L${libdir} -lmruby
+Libs.private: -lm
+Cflags: -I${includedir}
