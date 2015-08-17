@@ -15,6 +15,8 @@ namespace MRb {
 
     public Value float_value(float val);
 
+    public Value cptr_value(void* val);
+
     [CCode (cname = "mrb_open")]
     public Context();
 
@@ -421,6 +423,8 @@ namespace MRb {
   public Value nil_value();
   public Value true_value();
   public Value false_value();
+  
+  public void* cptr(Value obj);
 
   [CCode (cname = "MRB_ARGS_NONE")]
   public uint32 args_none();

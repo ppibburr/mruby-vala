@@ -32,7 +32,7 @@ class IMeth
   attr_accessor :symbol
 end
 
-Dir.glob(File.join(MRB_INCLUDE_DIR, "include", "*.h")).push(File.join(MRB_INCLUDE_DIR, "mruby.h")).each do |f|
+Dir.glob(File.join(MRB_INCLUDE_DIR, "mruby", "*.h")).push(File.join(MRB_INCLUDE_DIR, "mruby.h")).each do |f|
   File.read(f).each_line do |l|
     if l =~ /\(.*\).*\(/
       STDERR.puts "// #{l}"
@@ -111,6 +111,7 @@ puts "  public class Context {"
 puts "    public void* object_class;"
 puts "    public int get_args(string fmt, ...);\n\n"
 puts "    public Value float_value(float val);\n\n"
+puts "    public Value cptr_value(void* val);\n\n"
 puts "    [CCode (cname = \"mrb_open\")]"
 puts "    public Context();"
 METHS.each do |m|
@@ -125,6 +126,8 @@ puts <<-EOC
   public Value nil_value();
   public Value true_value();
   public Value false_value();
+  
+  public void* cptr(Value obj);
 EOC
 
 [:none, :rest, :block, :any].each do |k|

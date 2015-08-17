@@ -1,5 +1,12 @@
 using MRb;
 
+public class Foo : Object {
+  public int bar {get;set;}
+  public Foo(int bar) {
+    Object(bar:bar);
+  }
+}
+
 void main() {
   // Create a context
   var mrb = new Context();
@@ -33,7 +40,13 @@ void main() {
   
   mrb.define_method(mrb.object_class, "float_val", (mrb) => {
       return mrb.float_value(88.34f);
-  }, args_none());     
+  }, args_none());    
+  
+  mrb.define_method(mrb.object_class, "data", (mrb) => {
+      return mrb.cptr_value(new Foo(5)); 
+  }, args_none());   
+  
+
   
   mrb.define_method(mrb.object_class, "add", (mrb, self)=>{ 
     int ap, bp;
@@ -67,6 +80,9 @@ void main() {
       puts "add(3,9) was 12"
     end
   """);
+
+  var v = mrb.load_string("data()");
+  print("%d\n", ((Foo)cptr(v)).bar);
   
   mrb.close();
 }
