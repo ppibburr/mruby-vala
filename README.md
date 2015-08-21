@@ -3,7 +3,7 @@ MRuby bindings to Vala (and with gobject-introspection, any language that suppor
 
 Provides a .vapi file at ./vapi/mruby.vapi to bind mruby to Vala (can be re-generated from tools/gen_vapi.rb)
 
-Will provide a Shared Library to bind to other languages via GObjectIntospection
+Provides a Shared Library exposing a more intuitive API to mruby (and to bind to other languages via GObjectIntospection)
 
 Example
 ===
@@ -18,3 +18,21 @@ void main() {
 }
 
 ```
+
+INSTALL
+===
+```bash
+# clones and builds mruby into ./vender/mruby
+# installs mruby to prefix /usr
+# any mruby will work as long as compiled with -fPIC
+#
+# builds library, gir, typelib
+make
+
+# installs mruby-vala to prefix /usr
+make install
+```
+
+USING
+===
+`valac *.vala --pkg mruby-vala --pkg mruby`

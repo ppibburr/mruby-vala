@@ -11,7 +11,7 @@ namespace GI {
 		public static GI.Direction get_direction (GI.ArgInfo info);
 		public static GI.Transfer get_ownership_transfer (GI.ArgInfo info);
 		public static GI.ScopeType get_scope (GI.ArgInfo info);
-		public static GI.TypeInfo get_type (GI.ArgInfo info);
+		public GI.TypeInfo get_type ();
 		public static bool is_caller_allocates (GI.ArgInfo info);
 		public static bool is_optional (GI.ArgInfo info);
 		public static bool is_return_value (GI.ArgInfo info);
@@ -19,7 +19,7 @@ namespace GI {
 		public static void load_type (GI.ArgInfo info, out unowned GI.TypeInfo type);
 		public static bool may_be_null (GI.ArgInfo info);
 	}
-	[CCode (cheader_filename = "girepository.h", copy_function = "g_boxed_copy", free_function = "g_boxed_free", lower_case_csuffix = "base_info_gtype", type_id = "g_base_info_gtype_get_type ()")]
+	[CCode (cheader_filename = "girepository.h", ref_function="g_base_info_ref", unref_function="g_base_info_unref", copy_function = "g_boxed_copy", free_function = "g_boxed_free", lower_case_csuffix = "base_info_gtype", type_id = "g_base_info_gtype_get_type ()")]
 	[Compact]
 	public class BaseInfo {
 		[CCode (cname = "g_base_info_equal")]
@@ -38,6 +38,10 @@ namespace GI {
 		public unowned GI.Typelib get_typelib ();
 		[CCode (cname = "g_base_info_is_deprecated")]
 		public bool is_deprecated ();
+    [CCode (cname="g_base_info_ref")]
+    public void ref();
+    [CCode (cname="g_base_info_unref")]
+    public void unref();    
 		[CCode (cname = "g_base_info_iterate_attributes")]
 		public bool iterate_attributes (GI.AttributeIter iterator, out unowned string name, out unowned string value);
 	}
@@ -46,12 +50,12 @@ namespace GI {
 		[CCode (has_construct_function = false)]
 		protected CallableInfo ();
 		public static bool can_throw_gerror (GI.CallableInfo info);
-		public static GI.ArgInfo get_arg (GI.CallableInfo info, int n);
+		public GI.ArgInfo get_arg (int n);
 		public static GI.Transfer get_caller_owns (GI.CallableInfo info);
 		public static GI.Transfer get_instance_ownership_transfer (GI.CallableInfo info);
-		public static int get_n_args (GI.CallableInfo info);
+		public int get_n_args ();
 		public static unowned string get_return_attribute (GI.CallableInfo info, string name);
-		public static GI.TypeInfo get_return_type (GI.CallableInfo info);
+		public GI.TypeInfo get_return_type ();
 		public static bool invoke (GI.CallableInfo info, void* function, [CCode (array_length=false)] GI.Argument?[] in_args, int n_in_args, [CCode (array_length=false)] GI.Argument?[] out_args, int n_out_args, out GI.Argument? return_value, bool is_method, bool @throws) throws GLib.Error;
 		public static bool is_method (GI.CallableInfo info);
 		public static bool iterate_return_attributes (GI.CallableInfo info, GI.AttributeIter iterator, out unowned string name, out unowned string value);
@@ -92,7 +96,7 @@ namespace GI {
 		public static GI.TypeInfo get_type (GI.FieldInfo info);
 	}
 	[CCode (cheader_filename = "girepository.h")]
-	public class FunctionInfo : GI.BaseInfo {
+	public class FunctionInfo : GI.CallableInfo {
 		[CCode (has_construct_function = false)]
 		protected FunctionInfo ();
 		public GI.FunctionInfoFlags get_flags ();
@@ -105,7 +109,7 @@ namespace GI {
 	public class InterfaceInfo : GI.BaseInfo {
 		[CCode (has_construct_function = false)]
 		protected InterfaceInfo ();
-		public static GI.FunctionInfo find_method (GI.InterfaceInfo info, string name);
+		public GI.FunctionInfo find_method (string name);
 		public static GI.SignalInfo find_signal (GI.InterfaceInfo info, string name);
 		public static GI.VFuncInfo find_vfunc (GI.InterfaceInfo info, string name);
 		public static GI.ConstantInfo get_constant (GI.InterfaceInfo info, int n);
@@ -126,7 +130,7 @@ namespace GI {
 	public class ObjectInfo : GI.BaseInfo {
 		[CCode (has_construct_function = false)]
 		protected ObjectInfo ();
-		public static GI.FunctionInfo find_method (GI.ObjectInfo info, string name);
+		public GI.FunctionInfo find_method (string name);
 		public static GI.FunctionInfo find_method_using_interfaces (GI.ObjectInfo info, string name, out GI.ObjectInfo implementor);
 		public static GI.SignalInfo find_signal (GI.ObjectInfo info, string name);
 		public static GI.VFuncInfo find_vfunc (GI.ObjectInfo info, string name);
@@ -138,11 +142,11 @@ namespace GI {
 		public static bool get_fundamental (GI.ObjectInfo info);
 		public static unowned string get_get_value_function (GI.ObjectInfo info);
 		public static GI.InterfaceInfo get_interface (GI.ObjectInfo info, int n);
-		public static GI.FunctionInfo get_method (GI.ObjectInfo info, int n);
+		public GI.FunctionInfo get_method (int n);
 		public static int get_n_constants (GI.ObjectInfo info);
 		public static int get_n_fields (GI.ObjectInfo info);
 		public static int get_n_interfaces (GI.ObjectInfo info);
-		public static int get_n_methods (GI.ObjectInfo info);
+		public int get_n_methods ();
 		public static int get_n_properties (GI.ObjectInfo info);
 		public static int get_n_signals (GI.ObjectInfo info);
 		public static int get_n_vfuncs (GI.ObjectInfo info);
@@ -215,7 +219,7 @@ namespace GI {
 	public class StructInfo : GI.BaseInfo {
 		[CCode (has_construct_function = false)]
 		protected StructInfo ();
-		public static GI.FunctionInfo find_method (GI.StructInfo info, string name);
+		public GI.FunctionInfo find_method (string name);
 		public static size_t get_alignment (GI.StructInfo info);
 		public static GI.FieldInfo get_field (GI.StructInfo info, int n);
 		public static GI.FunctionInfo get_method (GI.StructInfo info, int n);
@@ -232,10 +236,12 @@ namespace GI {
 		public static int get_array_fixed_size (GI.TypeInfo info);
 		public static int get_array_length (GI.TypeInfo info);
 		public static GI.ArrayType get_array_type (GI.TypeInfo info);
-		public static GI.BaseInfo get_interface (GI.TypeInfo info);
-		public static GI.TypeInfo get_param_type (GI.TypeInfo info, int n);
-		public static GI.TypeTag get_tag (GI.TypeInfo info);
-		public static bool is_pointer (GI.TypeInfo info);
+    [CCode (cname="g_type_info_get_interface")]    
+		public GI.BaseInfo get_interface ();
+		public GI.TypeInfo get_param_type (int n);
+    [CCode (cname="g_type_info_get_tag")]
+		public GI.TypeTag get_tag ();
+		public bool is_pointer ();
 		public static bool is_zero_terminated (GI.TypeInfo info);
 	}
 	[CCode (cheader_filename = "girepository.h")]
@@ -358,7 +364,7 @@ namespace GI {
 		ARG,
 		TYPE,
 		UNRESOLVED;
-		public static unowned string to_string (GI.InfoType type);
+		public unowned string to_string ();
 	}
 	[CCode (cheader_filename = "girepository.h", cprefix = "G_IREPOSITORY_ERROR_", has_type_id = false)]
 	public enum RepositoryError {
@@ -410,7 +416,7 @@ namespace GI {
 		GHASH,
 		ERROR,
 		UNICHAR;
-		public static unowned string to_string (GI.TypeTag type);
+		public unowned string to_string ();
 	}
 	[CCode (cheader_filename = "girepository.h", cprefix = "GI_VFUNC_", has_type_id = false)]
 	[Flags]
