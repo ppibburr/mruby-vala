@@ -1,47 +1,77 @@
 namespace MRuby {
+  
+  public enum GetArgsType {
+    STRING,
+    INT,
+    FLOAT,
+    BOOL,
+    ARRAY,
+    DATA,
+    OBJECT,
+    HASH,
+    SYMBOL,
+    BLOCK,
+    REST;
+  }   
+  
   public static void* cptr(MRuby.Value val) {
-    return MRb.cptr(val);
+    return MRb.cptr(val.actual);
   }
   
   public static MRuby.Value nil_value() {
-    return (MRuby.Value)MRb.nil_value();
+    return new MRuby.Value(MRb.nil_value());
   } 
   
   public static MRuby.Value true_value() {
-    return (MRuby.Value)MRb.true_value();
+    return new MRuby.Value(MRb.true_value());
   } 
   
   public static MRuby.Value false_value() {
-    return (MRuby.Value)MRb.false_value();
+    return new MRuby.Value(MRb.false_value());
   }       
   
   public static MRuby.Value bool_value(bool val) {
-    return (MRuby.Value)MRb.bool_value(val); 
+    return new MRuby.Value(MRb.bool_value(val)); 
   }
   
   public static MRuby.Value fixnum_value(int val) {
-    return (MRuby.Value)MRb.fixnum_value(val); 
+    return new MRuby.Value(MRb.fixnum_value(val)); 
   }  
   
-  public static MRuby.Value obj_value(void* obj) {
-    return (MRuby.Value)MRb.obj_value(obj);
-  }
-  
   public static void* obj_ptr(MRuby.Value obj) {
-    return MRb.obj_ptr(obj);
+    return MRb.obj_ptr(obj.actual);
   }
   
   public static void* class_ptr(MRuby.Value kls) {
-    return MRb.class_ptr(kls);
+    return MRb.class_ptr(kls.actual);
   }  
+  
+  public static int fixnum(Value v) {
+    return MRb.fixnum(v.actual);
+  }
+  
+  public static bool test(Value v) {
+    return MRb.test(v.actual);
+  }
+  
+  
+  public static MRb.Value[] vary2mrb(MRuby.Value[] a) {
+    MRb.Value[] o = new MRb.Value[0];
+    
+    for (int i=0; i < a.length; i++) {
+      o+=a[i].actual;
+    }
+    
+    return o;
+  }
 
-  public static MRuby.Value? gval2mrb(Context mrb, owned GLib.Value? val) {
+  public static MRuby.Value? gval2mrb(Context mrb, GLib.Value? val) {
     if (val == null) {
       return nil_value();
     }
     
-    if (val.type() == typeof(void*)) {
-      var t = (MRuby.Value?)(void*)val;
+    if (val.type() == typeof(MRuby.Value)) {
+      var t = (MRuby.Value)val;
       return t;
       
     } else if (val.type() == typeof(int)) {
@@ -66,18 +96,27 @@ namespace MRuby {
     }
   }
   
-  public struct Value : MRb.Value {
-    
+  public class Value : GLib.Object {
+    public weak MRb.Value actual;
+    public Value(MRb.Value act) {
+      this.actual = act;
+    }
   }
   
   public struct Symbol : MRb.mrb_sym {
     
   }
 
-  public class MRbFuncEnv : Object {
-    public void* fun;
-    public MRbFuncEnv(Module.FuncCB cb) {
-      this.fun = (void*)cb;
+  public delegate unowned GLib.Value FuncCB(Context mrb, MRuby.Value self);
+
+  public class MRbFuncEnv : GLib.Object {
+    public FuncCB fun;
+    public MRbFuncEnv(FuncCB cb) {
+      this.fun = cb;
     }
   }
+  
+  public MRuby.Object obj_value(void* obj) {
+    return new MRuby.Object(MRb.obj_value(obj));
+  }  
 }

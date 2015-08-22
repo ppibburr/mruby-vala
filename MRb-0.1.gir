@@ -3,5 +3,7 @@
 <package name="MRb"/>
 <c:include name="mruby.h"/>
 <namespace name="MRb" version="0.1" c:prefix="mrb">
+  <record name="Value">
+	</record>
 </namespace>
 </repository>

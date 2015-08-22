@@ -12,7 +12,7 @@ namespace MRb {
   public struct mrb_sym {}
 
   [Compact]
-  [CCode (cprefix = "mrb_", cname = "mrb_state", free_function = "")]
+  [CCode (cprefix = "mrb_", cname = "mrb_state", free_function = "mrb_close")]
   public class Context {
     public void* object_class;
     public int get_args(string fmt, ...);
@@ -158,6 +158,9 @@ namespace MRb {
 
     [CCode (cheader_filename = "mruby/numeric.h")]
     public Value float_to_str(Value x, string fmt);
+
+    [CCode (cheader_filename = "mruby/numeric.h")]
+    public float to_flo(Value x);
 
     [CCode (cheader_filename = "mruby/numeric.h")]
     public Value fixnum_plus(Value x, Value y);
@@ -644,6 +647,8 @@ namespace MRb {
   [CCode (cname="mrb_ptr")]
   public void* class_ptr(Value kls);
   public void* obj_ptr(Value o);
+  public static int fixnum(Value v);
+  public static bool test(Value v);  
 
   [CCode (cname = "MRB_ARGS_NONE")]
   public uint32 args_none();

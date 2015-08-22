@@ -2,7 +2,7 @@
 namespace MRuby {
   using MRb;
   public class Context : MRb.Context {
-    public new void define_method(string name, Module.FuncCB cb) {
+    public new void define_method(string name, FuncCB cb) {
       new Class(object_class).define_method(this, name, cb);
     }
     
@@ -15,79 +15,130 @@ namespace MRuby {
     }
     
     public new MRuby.Value float_value(float val) {
-      return (MRuby.Value)((MRb.Context)this).float_value(val);
+      return new MRuby.Value(((MRb.Context)this).float_value(val));
     }
     
     public new MRuby.Value cptr_value(void* val) {
-      return (MRuby.Value)((MRb.Context)this).cptr_value(val);
+      return new MRuby.Value(((MRb.Context)this).cptr_value(val));
     }    
     
     public new MRuby.Value obj_new(void* cls, MRuby.Value[] argv = {}) {
-      return (MRuby.Value)((MRb.Context)this).obj_new(cls, (MRb.Value[])argv);
+      return new MRuby.Value(((MRb.Context)this).obj_new(cls, (MRb.Value[])argv));
     }
     
-    public new unowned MRuby.Value? load_string(string str) {
-      return (MRuby.Value)((MRb.Context)this).load_string(str);
+    public new MRuby.Value? load_string(string str) {
+      return new MRuby.Value(((MRb.Context)this).load_string(str));
     }
     
+     public new GLib.Array<GLib.Value?> get_args(GetArgsType[] types, int optional_at = -1, out bool[] passed_optionals = null) {
+      int a;
+      unowned MRb.Value[]? b;
+
+      int n = ((MRb.Context)this).get_args("*", out b, out a);
+      
+      var ary = new GLib.Array<GLib.Value?>();
+      
+      for (int i=0; i < types.length; i++) {
+        if (i >= a) {
+          if (optional_at >= 0 && optional_at <= i) {
+            // Thats fine
+            return ary;
+            
+          } else {
+            // TODO: should raise argument error
+            return ary;
+          }
+        }
+        
+        
+        GLib.Value? v;
+        switch (types[i]) {
+        case GetArgsType.INT:
+          v = MRb.fixnum(((MRb.Context)this).Integer(b[i]));
+          ary.append_val(v);
+          break;
+          
+        case GetArgsType.FLOAT:
+          v = ((MRb.Context)this).to_flo(b[i]);
+          ary.append_val(v);
+          break;           
+          
+        case GetArgsType.BOOL:
+          v = MRb.test(b[i]);
+          ary.append_val(v);
+          break;
+          
+        case GetArgsType.STRING:
+          v = (string)((MRb.Context)this).str_to_cstr(b[i]);
+          ary.append_val(v);
+          break;          
+                    
+        default:
+          return ary;
+        }
+      }
+      
+      return ary;
+    }
+       
     public new MRuby.Value vm_special_get(MRuby.Symbol foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).vm_special_get(foo1);
+      return  new MRuby.Value(((MRb.Context)this).vm_special_get(foo1));
     }
 
     public new void vm_special_set(MRuby.Symbol foo1, MRuby.Value foo2) {
 
-       ((MRb.Context)this).vm_special_set(foo1, foo2);
+       ((MRb.Context)this).vm_special_set(foo1, foo2.actual);
     }
 
     public new MRuby.Value vm_iv_get(MRuby.Symbol foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).vm_iv_get(foo1);
+      return  new MRuby.Value(((MRb.Context)this).vm_iv_get(foo1));
     }
 
     public new void vm_iv_set(MRuby.Symbol foo1, MRuby.Value foo2) {
 
-       ((MRb.Context)this).vm_iv_set(foo1, foo2);
+       ((MRb.Context)this).vm_iv_set(foo1, foo2.actual);
     }
 
     public new MRuby.Value vm_cv_get(MRuby.Symbol foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).vm_cv_get(foo1);
+      return  new MRuby.Value(((MRb.Context)this).vm_cv_get(foo1));
     }
 
     public new void vm_cv_set(MRuby.Symbol foo1, MRuby.Value foo2) {
 
-       ((MRb.Context)this).vm_cv_set(foo1, foo2);
+       ((MRb.Context)this).vm_cv_set(foo1, foo2.actual);
     }
 
     public new MRuby.Value vm_const_get(MRuby.Symbol foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).vm_const_get(foo1);
+      return  new MRuby.Value(((MRb.Context)this).vm_const_get(foo1));
     }
 
     public new void vm_const_set(MRuby.Symbol foo1, MRuby.Value foo2) {
 
-       ((MRb.Context)this).vm_const_set(foo1, foo2);
+       ((MRb.Context)this).vm_const_set(foo1, foo2.actual);
     }
 
     public new MRuby.Value const_get(MRuby.Value foo1, MRuby.Symbol foo2) {
 
-      return  (MRuby.Value)((MRb.Context)this).const_get(foo1, foo2);
+      return  new MRuby.Value(((MRb.Context)this).const_get(foo1.actual, foo2));
     }
 
     public new void const_set(MRuby.Value foo1, MRuby.Symbol foo2, MRuby.Value foo3) {
 
-       ((MRb.Context)this).const_set(foo1, foo2, foo3);
+       ((MRb.Context)this).const_set(foo1.actual, foo2, foo3.actual);
     }
 
     public new bool const_defined(MRuby.Value foo1, MRuby.Symbol foo2) {
 
-      return  ((MRb.Context)this).const_defined(foo1, foo2);
+      return  ((MRb.Context)this).const_defined(foo1.actual, foo2);
     }
 
     public new void const_remove(MRuby.Value foo1, MRuby.Symbol foo2) {
 
-       ((MRb.Context)this).const_remove(foo1, foo2);
+       ((MRb.Context)this).const_remove(foo1.actual, foo2);
     }
 
     public new bool iv_p(MRuby.Symbol sym) {
@@ -102,42 +153,42 @@ namespace MRuby {
 
     public new MRuby.Value iv_get(MRuby.Value obj, MRuby.Symbol sym) {
 
-      return  (MRuby.Value)((MRb.Context)this).iv_get(obj, sym);
+      return  new MRuby.Value(((MRb.Context)this).iv_get(obj.actual, sym));
     }
 
     public new void iv_set(MRuby.Value obj, MRuby.Symbol sym, MRuby.Value v) {
 
-       ((MRb.Context)this).iv_set(obj, sym, v);
+       ((MRb.Context)this).iv_set(obj.actual, sym, v.actual);
     }
 
     public new bool iv_defined(MRuby.Value foo1, MRuby.Symbol foo2) {
 
-      return  ((MRb.Context)this).iv_defined(foo1, foo2);
+      return  ((MRb.Context)this).iv_defined(foo1.actual, foo2);
     }
 
     public new MRuby.Value iv_remove(MRuby.Value obj, MRuby.Symbol sym) {
 
-      return  (MRuby.Value)((MRb.Context)this).iv_remove(obj, sym);
+      return  new MRuby.Value(((MRb.Context)this).iv_remove(obj.actual, sym));
     }
 
     public new void iv_copy(MRuby.Value dst, MRuby.Value src) {
 
-       ((MRb.Context)this).iv_copy(dst, src);
+       ((MRb.Context)this).iv_copy(dst.actual, src.actual);
     }
 
     public new bool const_defined_at(MRuby.Value mod, MRuby.Symbol id) {
 
-      return  ((MRb.Context)this).const_defined_at(mod, id);
+      return  ((MRb.Context)this).const_defined_at(mod.actual, id);
     }
 
     public new MRuby.Value gv_get(MRuby.Symbol sym) {
 
-      return  (MRuby.Value)((MRb.Context)this).gv_get(sym);
+      return  new MRuby.Value(((MRb.Context)this).gv_get(sym));
     }
 
     public new void gv_set(MRuby.Symbol sym, MRuby.Value val) {
 
-       ((MRb.Context)this).gv_set(sym, val);
+       ((MRb.Context)this).gv_set(sym, val.actual);
     }
 
     public new void gv_remove(MRuby.Symbol sym) {
@@ -147,37 +198,37 @@ namespace MRuby {
 
     public new MRuby.Value cv_get(MRuby.Value mod, MRuby.Symbol sym) {
 
-      return  (MRuby.Value)((MRb.Context)this).cv_get(mod, sym);
+      return  new MRuby.Value(((MRb.Context)this).cv_get(mod.actual, sym));
     }
 
     public new void cv_set(MRuby.Value mod, MRuby.Symbol sym, MRuby.Value v) {
 
-       ((MRb.Context)this).cv_set(mod, sym, v);
+       ((MRb.Context)this).cv_set(mod.actual, sym, v.actual);
     }
 
     public new bool cv_defined(MRuby.Value mod, MRuby.Symbol sym) {
 
-      return  ((MRb.Context)this).cv_defined(mod, sym);
+      return  ((MRb.Context)this).cv_defined(mod.actual, sym);
     }
 
     public new MRuby.Value mod_constants(MRuby.Value mod) {
 
-      return  (MRuby.Value)((MRb.Context)this).mod_constants(mod);
+      return  new MRuby.Value(((MRb.Context)this).mod_constants(mod.actual));
     }
 
     public new MRuby.Value f_global_variables(MRuby.Value self) {
 
-      return  (MRuby.Value)((MRb.Context)this).f_global_variables(self);
+      return  new MRuby.Value(((MRb.Context)this).f_global_variables(self.actual));
     }
 
     public new MRuby.Value obj_instance_variables(MRuby.Value foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).obj_instance_variables(foo1);
+      return  new MRuby.Value(((MRb.Context)this).obj_instance_variables(foo1.actual));
     }
 
     public new MRuby.Value mod_class_variables(MRuby.Value foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).mod_class_variables(foo1);
+      return  new MRuby.Value(((MRb.Context)this).mod_class_variables(foo1.actual));
     }
 
     public new MRuby.Symbol class_sym(void* c, void* outer) {
@@ -197,77 +248,82 @@ namespace MRuby {
 
     public new MRuby.Value hash_new() {
 
-      return  (MRuby.Value)((MRb.Context)this).hash_new();
+      return  new MRuby.Value(((MRb.Context)this).hash_new());
     }
 
     public new void hash_set(MRuby.Value hash, MRuby.Value key, MRuby.Value val) {
 
-       ((MRb.Context)this).hash_set(hash, key, val);
+       ((MRb.Context)this).hash_set(hash.actual, key.actual, val.actual);
     }
 
     public new MRuby.Value hash_get(MRuby.Value hash, MRuby.Value key) {
 
-      return  (MRuby.Value)((MRb.Context)this).hash_get(hash, key);
+      return  new MRuby.Value(((MRb.Context)this).hash_get(hash.actual, key.actual));
     }
 
     public new MRuby.Value hash_fetch(MRuby.Value hash, MRuby.Value key, MRuby.Value def) {
 
-      return  (MRuby.Value)((MRb.Context)this).hash_fetch(hash, key, def);
+      return  new MRuby.Value(((MRb.Context)this).hash_fetch(hash.actual, key.actual, def.actual));
     }
 
     public new MRuby.Value hash_delete_key(MRuby.Value hash, MRuby.Value key) {
 
-      return  (MRuby.Value)((MRb.Context)this).hash_delete_key(hash, key);
+      return  new MRuby.Value(((MRb.Context)this).hash_delete_key(hash.actual, key.actual));
     }
 
     public new MRuby.Value hash_keys(MRuby.Value hash) {
 
-      return  (MRuby.Value)((MRb.Context)this).hash_keys(hash);
+      return  new MRuby.Value(((MRb.Context)this).hash_keys(hash.actual));
     }
 
     public new MRuby.Value check_hash_type(MRuby.Value hash) {
 
-      return  (MRuby.Value)((MRb.Context)this).check_hash_type(hash);
+      return  new MRuby.Value(((MRb.Context)this).check_hash_type(hash.actual));
     }
 
     public new MRuby.Value hash_empty_p(MRuby.Value self) {
 
-      return  (MRuby.Value)((MRb.Context)this).hash_empty_p(self);
+      return  new MRuby.Value(((MRb.Context)this).hash_empty_p(self.actual));
     }
 
     public new MRuby.Value hash_clear(MRuby.Value hash) {
 
-      return  (MRuby.Value)((MRb.Context)this).hash_clear(hash);
+      return  new MRuby.Value(((MRb.Context)this).hash_clear(hash.actual));
     }
 
     public new MRuby.Value flo_to_fixnum(MRuby.Value val) {
 
-      return  (MRuby.Value)((MRb.Context)this).flo_to_fixnum(val);
+      return  new MRuby.Value(((MRb.Context)this).flo_to_fixnum(val.actual));
     }
 
     public new MRuby.Value float_to_str(MRuby.Value x, string fmt) {
 
-      return  (MRuby.Value)((MRb.Context)this).float_to_str(x, fmt);
+      return  new MRuby.Value(((MRb.Context)this).float_to_str(x.actual, fmt));
+    }
+
+    public new float to_flo(MRuby.Value x) {
+
+      return  ((MRb.Context)this).to_flo(x.actual);
     }
 
     public new MRuby.Value fixnum_plus(MRuby.Value x, MRuby.Value y) {
 
-      return  (MRuby.Value)((MRb.Context)this).fixnum_plus(x, y);
+      return  new MRuby.Value(((MRb.Context)this).fixnum_plus(x.actual, y.actual));
     }
 
     public new MRuby.Value fixnum_minus(MRuby.Value x, MRuby.Value y) {
 
-      return  (MRuby.Value)((MRb.Context)this).fixnum_minus(x, y);
+      return  new MRuby.Value(((MRb.Context)this).fixnum_minus(x.actual, y.actual));
     }
 
     public new MRuby.Value fixnum_mul(MRuby.Value x, MRuby.Value y) {
 
-      return  (MRuby.Value)((MRb.Context)this).fixnum_mul(x, y);
+      return  new MRuby.Value(((MRb.Context)this).fixnum_mul(x.actual, y.actual));
     }
 
     public new MRuby.Value num_div(MRuby.Value x, MRuby.Value y) {
 
-      return  (MRuby.Value)((MRb.Context)this).num_div(x, y);
+      return  new MRuby.Value(((MRb.Context)this).num_div(x.actual, y.actual));
     }
 
     public new void* proc_new_cfunc(mrb_func foo1) {
@@ -277,227 +333,227 @@ namespace MRuby {
 
     public new MRuby.Value f_send(MRuby.Value self) {
 
-      return  (MRuby.Value)((MRb.Context)this).f_send(self);
+      return  new MRuby.Value(((MRb.Context)this).f_send(self.actual));
     }
 
     public new MRuby.Value proc_cfunc_env_get(int foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).proc_cfunc_env_get(foo1);
+      return  new MRuby.Value(((MRb.Context)this).proc_cfunc_env_get(foo1));
     }
 
     public new MRuby.Value ary_new_capa(int foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).ary_new_capa(foo1);
+      return  new MRuby.Value(((MRb.Context)this).ary_new_capa(foo1));
     }
 
     public new MRuby.Value ary_new() {
 
-      return  (MRuby.Value)((MRb.Context)this).ary_new();
+      return  new MRuby.Value(((MRb.Context)this).ary_new());
     }
 
     public new MRuby.Value ary_new_from_values(int size, MRuby.Value[] vals) {
 
-      return  (MRuby.Value)((MRb.Context)this).ary_new_from_values(size, (MRb.Value[])vals);
+      return  new MRuby.Value(((MRb.Context)this).ary_new_from_values(size, MRuby.vary2mrb(vals)));
     }
 
     public new MRuby.Value assoc_new(MRuby.Value car, MRuby.Value cdr) {
 
-      return  (MRuby.Value)((MRb.Context)this).assoc_new(car, cdr);
+      return  new MRuby.Value(((MRb.Context)this).assoc_new(car.actual, cdr.actual));
     }
 
     public new void ary_concat(MRuby.Value foo1, MRuby.Value foo2) {
 
-       ((MRb.Context)this).ary_concat(foo1, foo2);
+       ((MRb.Context)this).ary_concat(foo1.actual, foo2.actual);
     }
 
     public new MRuby.Value ary_splat(MRuby.Value foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).ary_splat(foo1);
+      return  new MRuby.Value(((MRb.Context)this).ary_splat(foo1.actual));
     }
 
     public new void ary_push(MRuby.Value foo1, MRuby.Value foo2) {
 
-       ((MRb.Context)this).ary_push(foo1, foo2);
+       ((MRb.Context)this).ary_push(foo1.actual, foo2.actual);
     }
 
     public new MRuby.Value ary_pop(MRuby.Value ary) {
 
-      return  (MRuby.Value)((MRb.Context)this).ary_pop(ary);
+      return  new MRuby.Value(((MRb.Context)this).ary_pop(ary.actual));
     }
 
     public new MRuby.Value ary_ref(MRuby.Value ary, int n) {
 
-      return  (MRuby.Value)((MRb.Context)this).ary_ref(ary, n);
+      return  new MRuby.Value(((MRb.Context)this).ary_ref(ary.actual, n));
     }
 
     public new void ary_set(MRuby.Value ary, int n, MRuby.Value val) {
 
-       ((MRb.Context)this).ary_set(ary, n, val);
+       ((MRb.Context)this).ary_set(ary.actual, n, val.actual);
     }
 
     public new void ary_replace(MRuby.Value a, MRuby.Value b) {
 
-       ((MRb.Context)this).ary_replace(a, b);
+       ((MRb.Context)this).ary_replace(a.actual, b.actual);
     }
 
     public new MRuby.Value check_array_type(MRuby.Value self) {
 
-      return  (MRuby.Value)((MRb.Context)this).check_array_type(self);
+      return  new MRuby.Value(((MRb.Context)this).check_array_type(self.actual));
     }
 
     public new MRuby.Value ary_unshift(MRuby.Value self, MRuby.Value item) {
 
-      return  (MRuby.Value)((MRb.Context)this).ary_unshift(self, item);
+      return  new MRuby.Value(((MRb.Context)this).ary_unshift(self.actual, item.actual));
     }
 
     public new MRuby.Value ary_shift(MRuby.Value self) {
 
-      return  (MRuby.Value)((MRb.Context)this).ary_shift(self);
+      return  new MRuby.Value(((MRb.Context)this).ary_shift(self.actual));
     }
 
     public new MRuby.Value ary_clear(MRuby.Value self) {
 
-      return  (MRuby.Value)((MRb.Context)this).ary_clear(self);
+      return  new MRuby.Value(((MRb.Context)this).ary_clear(self.actual));
     }
 
     public new MRuby.Value ary_join(MRuby.Value ary, MRuby.Value sep) {
 
-      return  (MRuby.Value)((MRb.Context)this).ary_join(ary, sep);
+      return  new MRuby.Value(((MRb.Context)this).ary_join(ary.actual, sep.actual));
     }
 
     public new MRuby.Value ary_resize(MRuby.Value ary, int len) {
 
-      return  (MRuby.Value)((MRb.Context)this).ary_resize(ary, len);
+      return  new MRuby.Value(((MRb.Context)this).ary_resize(ary.actual, len));
     }
 
     public new void str_concat(MRuby.Value foo1, MRuby.Value foo2) {
 
-       ((MRb.Context)this).str_concat(foo1, foo2);
+       ((MRb.Context)this).str_concat(foo1.actual, foo2.actual);
     }
 
     public new MRuby.Value str_plus(MRuby.Value foo1, MRuby.Value foo2) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_plus(foo1, foo2);
+      return  new MRuby.Value(((MRb.Context)this).str_plus(foo1.actual, foo2.actual));
     }
 
     public new MRuby.Value ptr_to_str(void* foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).ptr_to_str(foo1);
+      return  new MRuby.Value(((MRb.Context)this).ptr_to_str(foo1));
     }
 
     public new MRuby.Value obj_as_string(MRuby.Value obj) {
 
-      return  (MRuby.Value)((MRb.Context)this).obj_as_string(obj);
+      return  new MRuby.Value(((MRb.Context)this).obj_as_string(obj.actual));
     }
 
     public new MRuby.Value str_resize(MRuby.Value str, int len) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_resize(str, len);
+      return  new MRuby.Value(((MRb.Context)this).str_resize(str.actual, len));
     }
 
     public new MRuby.Value str_substr(MRuby.Value str, int beg, int len) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_substr(str, beg, len);
+      return  new MRuby.Value(((MRb.Context)this).str_substr(str.actual, beg, len));
     }
 
     public new MRuby.Value string_type(MRuby.Value str) {
 
-      return  (MRuby.Value)((MRb.Context)this).string_type(str);
+      return  new MRuby.Value(((MRb.Context)this).string_type(str.actual));
     }
 
     public new MRuby.Value check_string_type(MRuby.Value str) {
 
-      return  (MRuby.Value)((MRb.Context)this).check_string_type(str);
+      return  new MRuby.Value(((MRb.Context)this).check_string_type(str.actual));
     }
 
     public new MRuby.Value str_buf_new(size_t capa) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_buf_new(capa);
+      return  new MRuby.Value(((MRb.Context)this).str_buf_new(capa));
     }
 
     public new string string_value_ptr(MRuby.Value ptr) {
 
-      return  ((MRb.Context)this).string_value_ptr(ptr);
+      return  ((MRb.Context)this).string_value_ptr(ptr.actual);
     }
 
     public new MRuby.Value str_dup(MRuby.Value str) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_dup(str);
+      return  new MRuby.Value(((MRb.Context)this).str_dup(str.actual));
     }
 
     public new MRuby.Value str_intern(MRuby.Value self) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_intern(self);
+      return  new MRuby.Value(((MRb.Context)this).str_intern(self.actual));
     }
 
     public new MRuby.Value str_to_inum(MRuby.Value str, int _base, bool badcheck) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_to_inum(str, _base, badcheck);
+      return  new MRuby.Value(((MRb.Context)this).str_to_inum(str.actual, _base, badcheck));
     }
 
     public new MRuby.Value str_to_str(MRuby.Value str) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_to_str(str);
+      return  new MRuby.Value(((MRb.Context)this).str_to_str(str.actual));
     }
 
     public new bool str_equal(MRuby.Value str1, MRuby.Value str2) {
 
-      return  ((MRb.Context)this).str_equal(str1, str2);
+      return  ((MRb.Context)this).str_equal(str1.actual, str2.actual);
     }
 
     public new MRuby.Value str_cat(MRuby.Value str, string ptr, size_t len) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_cat(str, ptr, len);
+      return  new MRuby.Value(((MRb.Context)this).str_cat(str.actual, ptr, len));
     }
 
     public new MRuby.Value str_cat_cstr(MRuby.Value str, string ptr) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_cat_cstr(str, ptr);
+      return  new MRuby.Value(((MRb.Context)this).str_cat_cstr(str.actual, ptr));
     }
 
     public new MRuby.Value str_cat_str(MRuby.Value str, MRuby.Value str2) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_cat_str(str, str2);
+      return  new MRuby.Value(((MRb.Context)this).str_cat_str(str.actual, str2.actual));
     }
 
     public new MRuby.Value str_append(MRuby.Value str, MRuby.Value str2) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_append(str, str2);
+      return  new MRuby.Value(((MRb.Context)this).str_append(str.actual, str2.actual));
     }
 
     public new char* str_to_cstr(MRuby.Value str) {
 
-      return  ((MRb.Context)this).str_to_cstr(str);
+      return  ((MRb.Context)this).str_to_cstr(str.actual);
     }
 
     public new MRuby.Value str_pool(MRuby.Value str) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_pool(str);
+      return  new MRuby.Value(((MRb.Context)this).str_pool(str.actual));
     }
 
     public new int str_hash(MRuby.Value str) {
 
-      return  ((MRb.Context)this).str_hash(str);
+      return  ((MRb.Context)this).str_hash(str.actual);
     }
 
     public new MRuby.Value str_dump(MRuby.Value str) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_dump(str);
+      return  new MRuby.Value(((MRb.Context)this).str_dump(str.actual));
     }
 
     public new MRuby.Value str_inspect(MRuby.Value str) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_inspect(str);
+      return  new MRuby.Value(((MRb.Context)this).str_inspect(str.actual));
     }
 
     public new void noregexp(MRuby.Value self) {
 
-       ((MRb.Context)this).noregexp(self);
+       ((MRb.Context)this).noregexp(self.actual);
     }
 
     public new void regexp_check(MRuby.Value obj) {
 
-       ((MRb.Context)this).regexp_check(obj);
+       ((MRb.Context)this).regexp_check(obj.actual);
     }
 
     public new void* define_class_id(MRuby.Symbol foo1, void* foo2) {
@@ -512,12 +568,12 @@ namespace MRuby {
 
     public new void* vm_define_class(MRuby.Value foo1, MRuby.Value foo2, MRuby.Symbol foo3) {
 
-      return  ((MRb.Context)this).vm_define_class(foo1, foo2, foo3);
+      return  ((MRb.Context)this).vm_define_class(foo1.actual, foo2.actual, foo3);
     }
 
     public new void* vm_define_module(MRuby.Value foo1, MRuby.Symbol foo2) {
 
-      return  ((MRb.Context)this).vm_define_module(foo1, foo2);
+      return  ((MRb.Context)this).vm_define_module(foo1.actual, foo2);
     }
 
     public new void define_method_raw(void* foo1, MRuby.Symbol foo2, void* foo3) {
@@ -562,7 +618,7 @@ namespace MRuby {
 
     public new MRuby.Value range_new(MRuby.Value foo1, MRuby.Value foo2, bool foo3) {
 
-      return  (MRuby.Value)((MRb.Context)this).range_new(foo1, foo2, foo3);
+      return  new MRuby.Value(((MRb.Context)this).range_new(foo1.actual, foo2.actual, foo3));
     }
 
     public new void sys_fail(string mesg) {
@@ -572,22 +628,22 @@ namespace MRuby {
 
     public new MRuby.Value exc_new_str(void* c, MRuby.Value str) {
 
-      return  (MRuby.Value)((MRb.Context)this).exc_new_str(c, str);
+      return  new MRuby.Value(((MRb.Context)this).exc_new_str(c, str.actual));
     }
 
     public new MRuby.Value exc_backtrace(MRuby.Value exc) {
 
-      return  (MRuby.Value)((MRb.Context)this).exc_backtrace(exc);
+      return  new MRuby.Value(((MRb.Context)this).exc_backtrace(exc.actual));
     }
 
     public new MRuby.Value get_backtrace() {
 
-      return  (MRuby.Value)((MRb.Context)this).get_backtrace();
+      return  new MRuby.Value(((MRb.Context)this).get_backtrace());
     }
 
     public new MRuby.Value f_raise(MRuby.Value foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).f_raise(foo1);
+      return  new MRuby.Value(((MRb.Context)this).f_raise(foo1.actual));
     }
 
     public new void* define_class(string foo1, void* foo2) {
@@ -602,7 +658,7 @@ namespace MRuby {
 
     public new MRuby.Value singleton_class(MRuby.Value foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).singleton_class(foo1);
+      return  new MRuby.Value(((MRb.Context)this).singleton_class(foo1.actual));
     }
 
     public new void include_module(void* foo1, void* foo2) {
@@ -622,7 +678,7 @@ namespace MRuby {
 
     public new void define_const(void* foo1, string name, MRuby.Value foo2) {
 
-       ((MRb.Context)this).define_const(foo1, name, foo2);
+       ((MRb.Context)this).define_const(foo1, name, foo2.actual);
     }
 
     public new void undef_method(void* foo1, string foo2) {
@@ -637,7 +693,7 @@ namespace MRuby {
 
     public new MRuby.Value instance_new(MRuby.Value cv) {
 
-      return  (MRuby.Value)((MRb.Context)this).instance_new(cv);
+      return  new MRuby.Value(((MRb.Context)this).instance_new(cv.actual));
     }
 
     public new void* class_new(void* super) {
@@ -667,17 +723,17 @@ namespace MRuby {
 
     public new MRuby.Value notimplement_m(MRuby.Value foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).notimplement_m(foo1);
+      return  new MRuby.Value(((MRb.Context)this).notimplement_m(foo1.actual));
     }
 
     public new MRuby.Value obj_dup(MRuby.Value obj) {
 
-      return  (MRuby.Value)((MRb.Context)this).obj_dup(obj);
+      return  new MRuby.Value(((MRb.Context)this).obj_dup(obj.actual));
     }
 
     public new MRuby.Value check_to_integer(MRuby.Value val, string method) {
 
-      return  (MRuby.Value)((MRb.Context)this).check_to_integer(val, method);
+      return  new MRuby.Value(((MRb.Context)this).check_to_integer(val.actual, method));
     }
 
     public new bool obj_respond_to(void* c, MRuby.Symbol mid) {
@@ -697,12 +753,12 @@ namespace MRuby {
 
     public new MRuby.Value funcall_argv(MRuby.Value foo1, MRuby.Symbol foo2, int foo3, MRuby.Value[] foo4) {
 
-      return  (MRuby.Value)((MRb.Context)this).funcall_argv(foo1, foo2, foo3, (MRb.Value[])foo4);
+      return  new MRuby.Value(((MRb.Context)this).funcall_argv(foo1.actual, foo2, foo3, MRuby.vary2mrb(foo4)));
     }
 
     public new MRuby.Value funcall_with_block(MRuby.Value foo1, MRuby.Symbol foo2, int foo3, MRuby.Value[] foo4, MRuby.Value foo5) {
 
-      return  (MRuby.Value)((MRb.Context)this).funcall_with_block(foo1, foo2, foo3, (MRb.Value[])foo4, foo5);
+      return  new MRuby.Value(((MRb.Context)this).funcall_with_block(foo1.actual, foo2, foo3, MRuby.vary2mrb(foo4), foo5.actual));
     }
 
     public new MRuby.Symbol intern_cstr(string foo1) {
@@ -722,22 +778,22 @@ namespace MRuby {
 
     public new MRuby.Symbol intern_str(MRuby.Value foo1) {
 
-      return  (MRuby.Symbol)((MRb.Context)this).intern_str(foo1);
+      return  (MRuby.Symbol)((MRb.Context)this).intern_str(foo1.actual);
     }
 
     public new MRuby.Value check_intern_cstr(string foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).check_intern_cstr(foo1);
+      return  new MRuby.Value(((MRb.Context)this).check_intern_cstr(foo1));
     }
 
     public new MRuby.Value check_intern(string foo1, size_t foo2) {
 
-      return  (MRuby.Value)((MRb.Context)this).check_intern(foo1, foo2);
+      return  new MRuby.Value(((MRb.Context)this).check_intern(foo1, foo2));
     }
 
     public new MRuby.Value check_intern_str(MRuby.Value foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).check_intern_str(foo1);
+      return  new MRuby.Value(((MRb.Context)this).check_intern_str(foo1.actual));
     }
 
     public new string sym2name(MRuby.Symbol foo1) {
@@ -747,7 +803,7 @@ namespace MRuby {
 
     public new MRuby.Value sym2str(MRuby.Symbol foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).sym2str(foo1);
+      return  new MRuby.Value(((MRb.Context)this).sym2str(foo1));
     }
 
     public new void* malloc(size_t foo1) {
@@ -782,17 +838,17 @@ namespace MRuby {
 
     public new MRuby.Value str_new(string p, size_t len) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_new(p, len);
+      return  new MRuby.Value(((MRb.Context)this).str_new(p, len));
     }
 
     public new MRuby.Value str_new_cstr(string foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_new_cstr(foo1);
+      return  new MRuby.Value(((MRb.Context)this).str_new_cstr(foo1));
     }
 
     public new MRuby.Value str_new_static(string p, size_t len) {
 
-      return  (MRuby.Value)((MRb.Context)this).str_new_static(p, len);
+      return  new MRuby.Value(((MRb.Context)this).str_new_static(p, len));
     }
 
     public new void close() {
@@ -807,62 +863,62 @@ namespace MRuby {
 
     public new MRuby.Value top_self() {
 
-      return  (MRuby.Value)((MRb.Context)this).top_self();
+      return  new MRuby.Value(((MRb.Context)this).top_self());
     }
 
     public new MRuby.Value run(void* foo1, MRuby.Value foo2) {
 
-      return  (MRuby.Value)((MRb.Context)this).run(foo1, foo2);
+      return  new MRuby.Value(((MRb.Context)this).run(foo1, foo2.actual));
     }
 
     public new MRuby.Value toplevel_run(void* foo1) {
 
-      return  (MRuby.Value)((MRb.Context)this).toplevel_run(foo1);
+      return  new MRuby.Value(((MRb.Context)this).toplevel_run(foo1));
     }
 
     public new void p(MRuby.Value foo1) {
 
-       ((MRb.Context)this).p(foo1);
+       ((MRb.Context)this).p(foo1.actual);
     }
 
     public new MRuby.Symbol obj_to_sym(MRuby.Value name) {
 
-      return  (MRuby.Symbol)((MRb.Context)this).obj_to_sym(name);
+      return  (MRuby.Symbol)((MRb.Context)this).obj_to_sym(name.actual);
     }
 
     public new bool obj_eq(MRuby.Value foo1, MRuby.Value foo2) {
 
-      return  ((MRb.Context)this).obj_eq(foo1, foo2);
+      return  ((MRb.Context)this).obj_eq(foo1.actual, foo2.actual);
     }
 
     public new bool obj_equal(MRuby.Value foo1, MRuby.Value foo2) {
 
-      return  ((MRb.Context)this).obj_equal(foo1, foo2);
+      return  ((MRb.Context)this).obj_equal(foo1.actual, foo2.actual);
     }
 
     public new bool equal(MRuby.Value obj1, MRuby.Value obj2) {
 
-      return  ((MRb.Context)this).equal(obj1, obj2);
+      return  ((MRb.Context)this).equal(obj1.actual, obj2.actual);
     }
 
     public new MRuby.Value Integer(MRuby.Value val) {
 
-      return  (MRuby.Value)((MRb.Context)this).Integer(val);
+      return  new MRuby.Value(((MRb.Context)this).Integer(val.actual));
     }
 
     public new MRuby.Value Float(MRuby.Value val) {
 
-      return  (MRuby.Value)((MRb.Context)this).Float(val);
+      return  new MRuby.Value(((MRb.Context)this).Float(val.actual));
     }
 
     public new MRuby.Value inspect(MRuby.Value obj) {
 
-      return  (MRuby.Value)((MRb.Context)this).inspect(obj);
+      return  new MRuby.Value(((MRb.Context)this).inspect(obj.actual));
     }
 
     public new bool eql(MRuby.Value obj1, MRuby.Value obj2) {
 
-      return  ((MRb.Context)this).eql(obj1, obj2);
+      return  ((MRb.Context)this).eql(obj1.actual, obj2.actual);
     }
 
     public new void garbage_collect() {
@@ -882,42 +938,42 @@ namespace MRuby {
 
     public new MRuby.Value any_to_s(MRuby.Value obj) {
 
-      return  (MRuby.Value)((MRb.Context)this).any_to_s(obj);
+      return  new MRuby.Value(((MRb.Context)this).any_to_s(obj.actual));
     }
 
     public new string obj_classname(MRuby.Value obj) {
 
-      return  ((MRb.Context)this).obj_classname(obj);
+      return  ((MRb.Context)this).obj_classname(obj.actual);
     }
 
     public new void* obj_class(MRuby.Value obj) {
 
-      return  ((MRb.Context)this).obj_class(obj);
+      return  ((MRb.Context)this).obj_class(obj.actual);
     }
 
     public new MRuby.Value class_path(void* c) {
 
-      return  (MRuby.Value)((MRb.Context)this).class_path(c);
+      return  new MRuby.Value(((MRb.Context)this).class_path(c));
     }
 
     public new bool obj_is_kind_of(MRuby.Value obj, void* c) {
 
-      return  ((MRb.Context)this).obj_is_kind_of(obj, c);
+      return  ((MRb.Context)this).obj_is_kind_of(obj.actual, c);
     }
 
     public new MRuby.Value obj_inspect(MRuby.Value self) {
 
-      return  (MRuby.Value)((MRb.Context)this).obj_inspect(self);
+      return  new MRuby.Value(((MRb.Context)this).obj_inspect(self.actual));
     }
 
     public new MRuby.Value obj_clone(MRuby.Value self) {
 
-      return  (MRuby.Value)((MRb.Context)this).obj_clone(self);
+      return  new MRuby.Value(((MRb.Context)this).obj_clone(self.actual));
     }
 
     public new MRuby.Value exc_new(void* c, string ptr, size_t len) {
 
-      return  (MRuby.Value)((MRb.Context)this).exc_new(c, ptr, len);
+      return  new MRuby.Value(((MRb.Context)this).exc_new(c, ptr, len));
     }
 
     public new void print_backtrace() {
@@ -932,27 +988,27 @@ namespace MRuby {
 
     public new MRuby.Value yield(MRuby.Value b, MRuby.Value arg) {
 
-      return  (MRuby.Value)((MRb.Context)this).yield(b, arg);
+      return  new MRuby.Value(((MRb.Context)this).yield(b.actual, arg.actual));
     }
 
     public new MRuby.Value yield_argv(MRuby.Value b, int argc, MRuby.Value[] argv) {
 
-      return  (MRuby.Value)((MRb.Context)this).yield_argv(b, argc, (MRb.Value[])argv);
+      return  new MRuby.Value(((MRb.Context)this).yield_argv(b.actual, argc, MRuby.vary2mrb(argv)));
     }
 
     public new MRuby.Value yield_with_class(MRuby.Value b, int argc, MRuby.Value[] argv, MRuby.Value self, void* c) {
 
-      return  (MRuby.Value)((MRb.Context)this).yield_with_class(b, argc, (MRb.Value[])argv, self, c);
+      return  new MRuby.Value(((MRb.Context)this).yield_with_class(b.actual, argc, MRuby.vary2mrb(argv), self.actual, c));
     }
 
     public new void gc_protect(MRuby.Value obj) {
 
-       ((MRb.Context)this).gc_protect(obj);
+       ((MRb.Context)this).gc_protect(obj.actual);
     }
 
     public new MRuby.Value to_int(MRuby.Value val) {
 
-      return  (MRuby.Value)((MRb.Context)this).to_int(val);
+      return  new MRuby.Value(((MRb.Context)this).to_int(val.actual));
     }
 
     public new void define_alias(void* klass, string name1, string name2) {
@@ -967,32 +1023,32 @@ namespace MRuby {
 
     public new void define_global_const(string name, MRuby.Value val) {
 
-       ((MRb.Context)this).define_global_const(name, val);
+       ((MRb.Context)this).define_global_const(name, val.actual);
     }
 
     public new MRuby.Value attr_get(MRuby.Value obj, MRuby.Symbol id) {
 
-      return  (MRuby.Value)((MRb.Context)this).attr_get(obj, id);
+      return  new MRuby.Value(((MRb.Context)this).attr_get(obj.actual, id));
     }
 
     public new bool respond_to(MRuby.Value obj, MRuby.Symbol mid) {
 
-      return  ((MRb.Context)this).respond_to(obj, mid);
+      return  ((MRb.Context)this).respond_to(obj.actual, mid);
     }
 
     public new bool obj_is_instance_of(MRuby.Value obj, void* c) {
 
-      return  ((MRb.Context)this).obj_is_instance_of(obj, c);
+      return  ((MRb.Context)this).obj_is_instance_of(obj.actual, c);
     }
 
     public new MRuby.Value fiber_resume(MRuby.Value fib, int argc, MRuby.Value[] argv) {
 
-      return  (MRuby.Value)((MRb.Context)this).fiber_resume(fib, argc, (MRb.Value[])argv);
+      return  new MRuby.Value(((MRb.Context)this).fiber_resume(fib.actual, argc, MRuby.vary2mrb(argv)));
     }
 
     public new MRuby.Value fiber_yield(int argc, MRuby.Value[] argv) {
 
-      return  (MRuby.Value)((MRb.Context)this).fiber_yield(argc, (MRb.Value[])argv);
+      return  new MRuby.Value(((MRb.Context)this).fiber_yield(argc, MRuby.vary2mrb(argv)));
     }
 
     public new void* alloca(size_t foo1) {
