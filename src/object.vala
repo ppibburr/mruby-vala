@@ -17,14 +17,14 @@ namespace MRuby {
       return (Object)mrb.obj_clone(this);
     }    
 
-    public MRuby.Value instance_variables(MRuby.Context mrb) {
-
-      return  mrb.obj_instance_variables(this );
-    }
-
     public MRuby.Value as_string(MRuby.Context mrb) {
 
       return  mrb.obj_as_string(this );
+    }
+
+    public MRuby.Value instance_variables(MRuby.Context mrb) {
+
+      return  mrb.obj_instance_variables(this );
     }
 
     public bool respond_to(MRuby.Context mrb, MRuby.Symbol mid) {

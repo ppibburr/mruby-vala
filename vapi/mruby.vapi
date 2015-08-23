@@ -1,5 +1,34 @@
 [CCode (cprefix = "mrb_", cheader_filename = "mruby.h", gir_namespace = "MRb", gir_version = "0.1")]
 namespace MRb {
+
+
+	public enum vtype {
+	  FALSE = 0,   /*   0 */
+	  FREE,        /*   1 */
+	  TRUE,        /*   2 */
+	  FIXNUM,      /*   3 */
+	  SYMBOL,      /*   4 */
+	  UNDEF,       /*   5 */
+	  FLOAT,       /*   6 */
+	  CPTR,        /*   7 */
+	  OBJECT,      /*   8 */
+	  CLASS,       /*   9 */
+	  MODULE,      /*  10 */
+	  ICLASS,      /*  11 */
+	  SCLASS,      /*  12 */
+	  PROC,        /*  13 */
+	  ARRAY,       /*  14 */
+	  HASH,        /*  15 */
+	  STRING,      /*  16 */
+	  RANGE,       /*  17 */
+	  EXCEPTION,   /*  18 */
+	  FILE,        /*  19 */
+	  ENV,         /*  20 */
+	  DATA,        /*  21 */
+	  FIBER,       /*  22 */
+	  MAXDEFINE;    /*  23 */
+	}
+
   [CCode (has_target = false, cname="mrb_func_t")]
   public delegate Value mrb_func(Context mrb, Value self);
 
@@ -21,8 +50,256 @@ namespace MRb {
 
     public Value cptr_value(void* val);
 
+    public int ary_len(Value a);
+
     [CCode (cname = "mrb_open")]
     public Context();
+
+    [CCode (cheader_filename = "mruby/error.h")]
+    public void sys_fail(string mesg);
+
+    [CCode (cheader_filename = "mruby/error.h")]
+    public Value exc_new_str(void* c, Value str);
+
+    [CCode (cheader_filename = "mruby/error.h")]
+    public Value exc_backtrace(Value exc);
+
+    [CCode (cheader_filename = "mruby/error.h")]
+    public Value get_backtrace();
+
+    [CCode (cheader_filename = "mruby/error.h")]
+    public Value f_raise(Value foo1);
+
+    [CCode (cheader_filename = "mruby/compile.h")]
+    public unowned Value load_string(string s);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public void str_concat(Value foo1, Value foo2);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value str_plus(Value foo1, Value foo2);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value ptr_to_str(void* foo1);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value obj_as_string(Value obj);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value str_resize(Value str, int len);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value str_substr(Value str, int beg, int len);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value string_type(Value str);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value check_string_type(Value str);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value str_buf_new(size_t capa);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public string string_value_ptr(Value ptr);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value str_dup(Value str);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value str_intern(Value self);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value str_to_inum(Value str, int _base, bool badcheck);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value str_to_str(Value str);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public bool str_equal(Value str1, Value str2);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value str_cat(Value str, string ptr, size_t len);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value str_cat_cstr(Value str, string ptr);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value str_cat_str(Value str, Value str2);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value str_append(Value str, Value str2);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public char* str_to_cstr(Value str);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value str_pool(Value str);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public int str_hash(Value str);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value str_dump(Value str);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public Value str_inspect(Value str);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public void noregexp(Value self);
+
+    [CCode (cheader_filename = "mruby/string.h")]
+    public void regexp_check(Value obj);
+
+    [CCode (cheader_filename = "mruby/range.h")]
+    public Value range_new(Value foo1, Value foo2, bool foo3);
+
+    [CCode (cheader_filename = "mruby/class.h")]
+    public void* define_class_id(mrb_sym foo1, void* foo2);
+
+    [CCode (cheader_filename = "mruby/class.h")]
+    public void* define_module_id(mrb_sym foo1);
+
+    [CCode (cheader_filename = "mruby/class.h")]
+    public void* vm_define_class(Value foo1, Value foo2, mrb_sym foo3);
+
+    [CCode (cheader_filename = "mruby/class.h")]
+    public void* vm_define_module(Value foo1, mrb_sym foo2);
+
+    [CCode (cheader_filename = "mruby/class.h")]
+    public void define_method_raw(void* foo1, mrb_sym foo2, void* foo3);
+
+    [CCode (cheader_filename = "mruby/class.h")]
+    public void define_method_id(void* c, mrb_sym mid, mrb_func func, uint32 aspec);
+
+    [CCode (cheader_filename = "mruby/class.h")]
+    public void alias_method(void* c, mrb_sym a, mrb_sym b);
+
+    [CCode (cheader_filename = "mruby/class.h")]
+    public void* class_outer_module(void* foo1);
+
+    [CCode (cheader_filename = "mruby/class.h")]
+    public void* method_search(void* foo1, mrb_sym foo2);
+
+    [CCode (cheader_filename = "mruby/class.h")]
+    public void gc_mark_mt(void* foo1);
+
+    [CCode (cheader_filename = "mruby/class.h")]
+    public size_t gc_mark_mt_size(void* foo1);
+
+    [CCode (cheader_filename = "mruby/class.h")]
+    public void gc_free_mt(void* foo1);
+
+    [CCode (cheader_filename = "mruby/numeric.h")]
+    public Value flo_to_fixnum(Value val);
+
+    [CCode (cheader_filename = "mruby/numeric.h")]
+    public Value float_to_str(Value x, string fmt);
+
+    [CCode (cheader_filename = "mruby/numeric.h")]
+    public float to_flo(Value x);
+
+    [CCode (cheader_filename = "mruby/numeric.h")]
+    public Value fixnum_plus(Value x, Value y);
+
+    [CCode (cheader_filename = "mruby/numeric.h")]
+    public Value fixnum_minus(Value x, Value y);
+
+    [CCode (cheader_filename = "mruby/numeric.h")]
+    public Value fixnum_mul(Value x, Value y);
+
+    [CCode (cheader_filename = "mruby/numeric.h")]
+    public Value num_div(Value x, Value y);
+
+    [CCode (cheader_filename = "mruby/proc.h")]
+    public void* proc_new_cfunc(mrb_func foo1);
+
+    [CCode (cheader_filename = "mruby/proc.h")]
+    public Value f_send(Value self);
+
+    [CCode (cheader_filename = "mruby/proc.h")]
+    public void* proc_new_cfunc_with_env(mrb_func func, [CCode (array_length_pos=1)] Value[] env);
+
+    [CCode (cheader_filename = "mruby/proc.h")]
+    public Value proc_cfunc_env_get(int foo1);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public Value ary_new_capa(int foo1);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public Value ary_new();
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public Value ary_new_from_values(int size,  [CCode (array_length=false)] Value[] vals);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public Value assoc_new(Value car, Value cdr);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public void ary_concat(Value foo1, Value foo2);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public Value ary_splat(Value foo1);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public void ary_push(Value foo1, Value foo2);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public Value ary_pop(Value ary);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public Value ary_ref(Value ary, int n);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public void ary_set(Value ary, int n, Value val);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public void ary_replace(Value a, Value b);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public Value check_array_type(Value self);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public Value ary_unshift(Value self, Value item);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public Value ary_shift(Value self);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public Value ary_clear(Value self);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public Value ary_join(Value ary, Value sep);
+
+    [CCode (cheader_filename = "mruby/array.h")]
+    public Value ary_resize(Value ary, int len);
+
+    [CCode (cheader_filename = "mruby/hash.h")]
+    public Value hash_new();
+
+    [CCode (cheader_filename = "mruby/hash.h")]
+    public void hash_set(Value hash, Value key, Value val);
+
+    [CCode (cheader_filename = "mruby/hash.h")]
+    public Value hash_get(Value hash, Value key);
+
+    [CCode (cheader_filename = "mruby/hash.h")]
+    public Value hash_fetch(Value hash, Value key, Value def);
+
+    [CCode (cheader_filename = "mruby/hash.h")]
+    public Value hash_delete_key(Value hash, Value key);
+
+    [CCode (cheader_filename = "mruby/hash.h")]
+    public Value hash_keys(Value hash);
+
+    [CCode (cheader_filename = "mruby/hash.h")]
+    public Value check_hash_type(Value hash);
+
+    [CCode (cheader_filename = "mruby/hash.h")]
+    public Value hash_empty_p(Value self);
+
+    [CCode (cheader_filename = "mruby/hash.h")]
+    public Value hash_clear(Value hash);
 
     [CCode (cheader_filename = "mruby/variable.h")]
     public Value vm_special_get(mrb_sym foo1);
@@ -122,252 +399,6 @@ namespace MRb {
 
     [CCode (cheader_filename = "mruby/variable.h")]
     public void gc_free_gv();
-
-    [CCode (cheader_filename = "mruby/hash.h")]
-    public Value hash_new();
-
-    [CCode (cheader_filename = "mruby/hash.h")]
-    public void hash_set(Value hash, Value key, Value val);
-
-    [CCode (cheader_filename = "mruby/hash.h")]
-    public Value hash_get(Value hash, Value key);
-
-    [CCode (cheader_filename = "mruby/hash.h")]
-    public Value hash_fetch(Value hash, Value key, Value def);
-
-    [CCode (cheader_filename = "mruby/hash.h")]
-    public Value hash_delete_key(Value hash, Value key);
-
-    [CCode (cheader_filename = "mruby/hash.h")]
-    public Value hash_keys(Value hash);
-
-    [CCode (cheader_filename = "mruby/hash.h")]
-    public Value check_hash_type(Value hash);
-
-    [CCode (cheader_filename = "mruby/hash.h")]
-    public Value hash_empty_p(Value self);
-
-    [CCode (cheader_filename = "mruby/hash.h")]
-    public Value hash_clear(Value hash);
-
-    [CCode (cheader_filename = "mruby/compile.h")]
-    public unowned Value load_string(string s);
-
-    [CCode (cheader_filename = "mruby/numeric.h")]
-    public Value flo_to_fixnum(Value val);
-
-    [CCode (cheader_filename = "mruby/numeric.h")]
-    public Value float_to_str(Value x, string fmt);
-
-    [CCode (cheader_filename = "mruby/numeric.h")]
-    public float to_flo(Value x);
-
-    [CCode (cheader_filename = "mruby/numeric.h")]
-    public Value fixnum_plus(Value x, Value y);
-
-    [CCode (cheader_filename = "mruby/numeric.h")]
-    public Value fixnum_minus(Value x, Value y);
-
-    [CCode (cheader_filename = "mruby/numeric.h")]
-    public Value fixnum_mul(Value x, Value y);
-
-    [CCode (cheader_filename = "mruby/numeric.h")]
-    public Value num_div(Value x, Value y);
-
-    [CCode (cheader_filename = "mruby/proc.h")]
-    public void* proc_new_cfunc(mrb_func foo1);
-
-    [CCode (cheader_filename = "mruby/proc.h")]
-    public Value f_send(Value self);
-
-    [CCode (cheader_filename = "mruby/proc.h")]
-    public void* proc_new_cfunc_with_env(mrb_func func, [CCode (array_length_pos=1)] Value[] env);
-
-    [CCode (cheader_filename = "mruby/proc.h")]
-    public Value proc_cfunc_env_get(int foo1);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public Value ary_new_capa(int foo1);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public Value ary_new();
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public Value ary_new_from_values(int size,  [CCode (array_length=false)] Value[] vals);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public Value assoc_new(Value car, Value cdr);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public void ary_concat(Value foo1, Value foo2);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public Value ary_splat(Value foo1);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public void ary_push(Value foo1, Value foo2);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public Value ary_pop(Value ary);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public Value ary_ref(Value ary, int n);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public void ary_set(Value ary, int n, Value val);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public void ary_replace(Value a, Value b);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public Value check_array_type(Value self);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public Value ary_unshift(Value self, Value item);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public Value ary_shift(Value self);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public Value ary_clear(Value self);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public Value ary_join(Value ary, Value sep);
-
-    [CCode (cheader_filename = "mruby/array.h")]
-    public Value ary_resize(Value ary, int len);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public void str_concat(Value foo1, Value foo2);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value str_plus(Value foo1, Value foo2);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value ptr_to_str(void* foo1);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value obj_as_string(Value obj);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value str_resize(Value str, int len);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value str_substr(Value str, int beg, int len);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value string_type(Value str);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value check_string_type(Value str);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value str_buf_new(size_t capa);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public string string_value_ptr(Value ptr);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value str_dup(Value str);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value str_intern(Value self);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value str_to_inum(Value str, int _base, bool badcheck);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value str_to_str(Value str);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public bool str_equal(Value str1, Value str2);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value str_cat(Value str, string ptr, size_t len);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value str_cat_cstr(Value str, string ptr);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value str_cat_str(Value str, Value str2);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value str_append(Value str, Value str2);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public char* str_to_cstr(Value str);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value str_pool(Value str);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public int str_hash(Value str);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value str_dump(Value str);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public Value str_inspect(Value str);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public void noregexp(Value self);
-
-    [CCode (cheader_filename = "mruby/string.h")]
-    public void regexp_check(Value obj);
-
-    [CCode (cheader_filename = "mruby/class.h")]
-    public void* define_class_id(mrb_sym foo1, void* foo2);
-
-    [CCode (cheader_filename = "mruby/class.h")]
-    public void* define_module_id(mrb_sym foo1);
-
-    [CCode (cheader_filename = "mruby/class.h")]
-    public void* vm_define_class(Value foo1, Value foo2, mrb_sym foo3);
-
-    [CCode (cheader_filename = "mruby/class.h")]
-    public void* vm_define_module(Value foo1, mrb_sym foo2);
-
-    [CCode (cheader_filename = "mruby/class.h")]
-    public void define_method_raw(void* foo1, mrb_sym foo2, void* foo3);
-
-    [CCode (cheader_filename = "mruby/class.h")]
-    public void define_method_id(void* c, mrb_sym mid, mrb_func func, uint32 aspec);
-
-    [CCode (cheader_filename = "mruby/class.h")]
-    public void alias_method(void* c, mrb_sym a, mrb_sym b);
-
-    [CCode (cheader_filename = "mruby/class.h")]
-    public void* class_outer_module(void* foo1);
-
-    [CCode (cheader_filename = "mruby/class.h")]
-    public void* method_search(void* foo1, mrb_sym foo2);
-
-    [CCode (cheader_filename = "mruby/class.h")]
-    public void gc_mark_mt(void* foo1);
-
-    [CCode (cheader_filename = "mruby/class.h")]
-    public size_t gc_mark_mt_size(void* foo1);
-
-    [CCode (cheader_filename = "mruby/class.h")]
-    public void gc_free_mt(void* foo1);
-
-    [CCode (cheader_filename = "mruby/range.h")]
-    public Value range_new(Value foo1, Value foo2, bool foo3);
-
-    [CCode (cheader_filename = "mruby/error.h")]
-    public void sys_fail(string mesg);
-
-    [CCode (cheader_filename = "mruby/error.h")]
-    public Value exc_new_str(void* c, Value str);
-
-    [CCode (cheader_filename = "mruby/error.h")]
-    public Value exc_backtrace(Value exc);
-
-    [CCode (cheader_filename = "mruby/error.h")]
-    public Value get_backtrace();
-
-    [CCode (cheader_filename = "mruby/error.h")]
-    public Value f_raise(Value foo1);
 
     [CCode (cheader_filename = "mruby.h")]
     public void* define_class(string foo1, void* foo2);
@@ -638,6 +669,7 @@ namespace MRb {
   public Value fixnum_value(int val);
   public Value float_value(Context mrb, float val);
   public Value nil_value();
+  public void* nil_p(Value v);
   public Value true_value();
   public Value false_value();
   public Value obj_value(void* obj);
@@ -649,6 +681,11 @@ namespace MRb {
   public void* obj_ptr(Value o);
   public static int fixnum(Value v);
   public static bool test(Value v);  
+  public static void assert(void* a);
+  [CCode (cname="RARRAY_LEN")]
+  public static int RARRAY_LEN(MRb.Value a);
+  public static int type(MRb.Value v);
+  
 
   [CCode (cname = "MRB_ARGS_NONE")]
   public uint32 args_none();

@@ -54,6 +54,25 @@ namespace MRuby {
     return MRb.test(v.actual);
   }
   
+  public static TT type(Value v) {
+    return (TT)MRb.type(v.actual);
+  }
+  
+  public static void* nil_p(Value v) {
+    return MRb.nil_p(v.actual); 
+  }
+  
+  public static MRuby.Value[] mrb2vary(MRb.Value[] m, int? a = null) {
+    int len = a ?? m.length;
+    
+    MRuby.Value[] ary = new MRuby.Value[0];
+    
+    for (int i=0; i < len; i++) {
+      ary += new MRuby.Value(m[i]);
+    }
+    
+    return ary;
+  }
   
   public static MRb.Value[] vary2mrb(MRuby.Value[] a) {
     MRb.Value[] o = new MRb.Value[0];
@@ -64,16 +83,73 @@ namespace MRuby {
     
     return o;
   }
+  
+	public enum TT {
+	  FALSE = 0,   /*   0 */
+	  FREE,        /*   1 */
+	  TRUE,        /*   2 */
+	  FIXNUM,      /*   3 */
+	  SYMBOL,      /*   4 */
+	  UNDEF,       /*   5 */
+	  FLOAT,       /*   6 */
+	  CPTR,        /*   7 */
+	  OBJECT,      /*   8 */
+	  CLASS,       /*   9 */
+	  MODULE,      /*  10 */
+	  ICLASS,      /*  11 */
+	  SCLASS,      /*  12 */
+	  PROC,        /*  13 */
+	  ARRAY,       /*  14 */
+	  HASH,        /*  15 */
+	  STRING,      /*  16 */
+	  RANGE,       /*  17 */
+	  EXCEPTION,   /*  18 */
+	  FILE,        /*  19 */
+	  ENV,         /*  20 */
+	  DATA,        /*  21 */
+	  FIBER,       /*  22 */
+	  MAXDEFINE;    /*  23 */
+	}
+  
+  public static GLib.Value? mrb2gval(Context mrb, MRuby.Value m) {
+	  switch (type(m)) {
+	  case TT.STRING:
+      return (string)mrb.str_to_cstr(m);
+	  case TT.FIXNUM:
+      return fixnum(m);
+	  case TT.FLOAT:
+      return mrb.to_flo(m);
+	  case TT.TRUE:
+      return true;
+    case TT.FALSE:
+      if (nil_p(m) != null) {
+        return false;
+      }
+      
+      return null;
+      
+    case TT.OBJECT:
+      return (MRuby.Object)m;
+    case TT.ARRAY:
+      return (MRuby.Array)m; 
+	  default:
+      return m;
+	  }
+  }
 
   public static MRuby.Value? gval2mrb(Context mrb, GLib.Value? val) {
     if (val == null) {
       return nil_value();
     }
     
-    if (val.type() == typeof(MRuby.Value)) {
-      var t = (MRuby.Value)val;
-      return t;
-      
+    if (val.type().is_object()) {
+	  if ((GLib.Object)val is MRuby.Value) {
+        var t = (MRuby.Value)val;
+        return t;
+  	  } else {
+		// TODO:
+		return MRuby.nil_value();  
+	  }
     } else if (val.type() == typeof(int)) {
       return fixnum_value((int)val);
    

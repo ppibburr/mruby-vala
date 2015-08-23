@@ -20,7 +20,7 @@ TYPES = {
   mrb_sym:"mrb_sym",
   :"const mrb_value*" => "Value[]",
   :"struct RProc*" => "void*",
-  :Context=>"Context"
+  :Context=>"Context",
 }
 
 METHS = []
@@ -115,8 +115,40 @@ end
 
 c=File.open("src/context.vala","w")
 o = File.open("src/object.vala","w")
+r = File.open("src/array.vala", "w")
+rm = File.open("src/array_with_context.vala","w")
 puts "[CCode (cprefix = \"mrb_\", cheader_filename = \"mruby.h\", gir_namespace = \"MRb\", gir_version = \"0.1\")]"
 puts "namespace MRb {"
+puts """
+
+	public enum vtype {
+	  FALSE = 0,   /*   0 */
+	  FREE,        /*   1 */
+	  TRUE,        /*   2 */
+	  FIXNUM,      /*   3 */
+	  SYMBOL,      /*   4 */
+	  UNDEF,       /*   5 */
+	  FLOAT,       /*   6 */
+	  CPTR,        /*   7 */
+	  OBJECT,      /*   8 */
+	  CLASS,       /*   9 */
+	  MODULE,      /*  10 */
+	  ICLASS,      /*  11 */
+	  SCLASS,      /*  12 */
+	  PROC,        /*  13 */
+	  ARRAY,       /*  14 */
+	  HASH,        /*  15 */
+	  STRING,      /*  16 */
+	  RANGE,       /*  17 */
+	  EXCEPTION,   /*  18 */
+	  FILE,        /*  19 */
+	  ENV,         /*  20 */
+	  DATA,        /*  21 */
+	  FIBER,       /*  22 */
+	  MAXDEFINE;    /*  23 */
+	}
+
+"""
 puts "  [CCode (has_target = false, cname=\"mrb_func_t\")]"
 puts "  public delegate Value mrb_func(Context mrb, Value self);\n\n"
 puts "  [SimpleType]"
@@ -132,6 +164,7 @@ puts "    public void* object_class;"
 puts "    public int get_args(string fmt, ...);\n\n"
 puts "    public Value float_value(float val);\n\n"
 puts "    public Value cptr_value(void* val);\n\n"
+puts "    public int ary_len(Value a);\n\n"
 puts "    [CCode (cname = \"mrb_open\")]"
 puts "    public Context();"
 
@@ -139,7 +172,8 @@ C_TYPES = {
   :mrb_sym=>"MRuby.Symbol",
   :Value  =>"MRuby.Value",
   :"Value[]"=>"MRuby.Value[]",
-  :"Context"=>"MRuby.Context"
+  :"Context"=>"MRuby.Context",
+  :TT=>"MRuby.TT"
 }
 
 EXC = [
@@ -157,6 +191,13 @@ OEXC = [
   :new,
   :dup,
   :clone
+]
+
+AEXC = [
+  :new,
+  :new_from_values,
+  :new_capa,
+  :ref
 ]
 
 o.puts """
@@ -203,7 +244,11 @@ namespace MRuby {
     
     public new MRuby.Value cptr_value(void* val) {
       return new MRuby.Value(((MRb.Context)this).cptr_value(val));
-    }    
+    }  
+    
+    public new int ary_len(MRuby.Value val) {
+      return ((MRb.Context)this).ary_len(val.actual);
+    }         
     
     public new MRuby.Value obj_new(void* cls, MRuby.Value[] argv = {}) {
       return new MRuby.Value(((MRb.Context)this).obj_new(cls, (MRb.Value[])argv));
@@ -213,15 +258,35 @@ namespace MRuby {
       return new MRuby.Value(((MRb.Context)this).load_string(str));
     }
     
-     public new GLib.Array<GLib.Value?> get_args(GetArgsType[] types, int optional_at = -1, out bool[] passed_optionals = null) {
+     public new GLib.Array<GLib.Value?> get_args(GetArgsType[] types, int optional_at = -1, out MRuby.Value[] args = null) {
       int a;
       unowned MRb.Value[]? b;
 
       int n = ((MRb.Context)this).get_args(\"*\", out b, out a);
       
+      if (args != null) {
+        args = mrb2vary(b, a);
+      }
+      
       var ary = new GLib.Array<GLib.Value?>();
       
+      if (a > types.length) {
+        // TODO: Too many args passed?
+        
+        // raise?
+      }
+      
       for (int i=0; i < types.length; i++) {
+        if (i >= a) { /* bad unless remainder were optional*/
+          if (optional_at >= 0 && optional_at <= i) {
+            return ary;
+          } else {
+            // TODO: should raise;
+            return ary;
+          }
+        }
+      
+      
         GLib.Value? v;
         switch (types[i]) {
         case GetArgsType.INT:
@@ -242,16 +307,170 @@ namespace MRuby {
         case GetArgsType.STRING:
           v = (string)((MRb.Context)this).str_to_cstr(b[i]);
           ary.append_val(v);
-          break;          
-                    
+          break;        
+          
+        case GetArgsType.OBJECT:
+          v = new MRuby.Object(b[i]);
+          ary.append_val(v); 
+          break;
+          
+        case GetArgsType.ARRAY:
+          ary.append_val(new MRuby.Array(b[i]));
+          break;
+          
         default:
-          return ary;
+          // TODO: throw
+          v = new MRuby.Value(b[i]);
+          break;
         }
       }
       
       return ary;
     }
+    
+    public GLib.Array<GLib.Value?> get_native_typed_args(GetArgsType[] types, int optional=-1, out MRuby.Value[] args = null) {
+      int a;
+      unowned MRb.Value[]? b;
+
+      int n = ((MRb.Context)this).get_args(\"*\", out b, out a);
+      
+      if (args != null) {
+        args = mrb2vary(b, a);
+      }      
+      
+      var ary = new GLib.Array<GLib.Value?>();
+      
+      if (a > types.length) {
+        // TODO: Too many args passed?
+        
+        // raise?
+      }
+      
+      for (int i=0; i < types.length; i++) {
+        if (i >= a) { /* bad unless remainder were optional*/
+          if (optional >= 0 && optional <= i) {
+            return ary;
+          } else {
+            // TODO: should raise;
+            return ary;
+          }
+        }
+        
+        ary.append_val(mrb2gval(this, new MRuby.Value(b[i])));
+      }
+      
+      return ary;
+    }
+    
+    public GLib.Array<GLib.Value?> get_native_untyped_args(int optional=-1, out MRuby.Value[] args = null) {
+      int a;
+      unowned MRb.Value[]? b;
+
+      int n = ((MRb.Context)this).get_args(\"*\", out b, out a);
+      
+      if (args != null) {
+        args = mrb2vary(b, a);
+      }      
+      
+      var ary = new GLib.Array<GLib.Value?>();
+      
+      if (optional >= 0 && optional > a) {
+        // TODO: should raise
+        return ary;
+      }
+      
+      for (int i=0; i < a; i++) {
+        ary.append_val(mrb2gval(this, new MRuby.Value(b[i])));
+      }
+      
+      return ary;
+    }    
        
+"""
+
+r.puts """
+namespace MRuby {
+  public class Array : MRuby.Value {
+    public Array(MRb.Value act) {
+      base(act);
+    }
+  
+    public Array.create(MRuby.Context mrb) {
+      base(((MRb.Context)mrb).ary_new());
+    }
+    
+    public Array.from_values(MRuby.Context mrb, MRuby.Value[] vals) {
+      base(((MRb.Context)mrb).ary_new_from_values(vals.length, MRuby.vary2mrb(vals)));
+    }
+    
+    public Array.from_gvalues(MRuby.Context mrb, GLib.Value?[] vals) {
+      MRuby.Value[] m = new MRuby.Value[0];
+      foreach(var v in vals) {
+        m += gval2mrb(mrb, v);
+      }
+      from_values(mrb, m);
+    }
+    
+    public Array.from_garray(MRuby.Context mrb, GLib.Array<GLib.Value?> g) {
+      MRuby.Value[] m = new MRuby.Value[0];    
+      for (int i=0; i < g.length; i++) {
+        m += gval2mrb(mrb, g.index(i));
+      }
+      from_values(mrb, m);
+    }
+    
+    public MRuby.Value get(MRuby.Context mrb, int idx) {
+      return mrb.ary_ref(this, idx);
+    }
+    
+    public int length {
+      get {
+        return MRb.RARRAY_LEN(this.actual);
+      }
+    }
+    
+    public GLib.Array<GLib.Value?> to_garray(MRuby.Context mrb) {
+      GLib.Array<GLib.Value?> o = new GLib.Array<GLib.Value?>();
+      for (int i=0; i < length; i++) {
+        o.append_val(this[mrb, i]);
+      }
+      
+      return o;
+    }
+    
+    public GLib.Value?[] to_native(MRuby.Context mrb) {
+      GLib.Value?[] n = new GLib.Value?[0];
+      
+      for (int i=0; i < length; i++) {
+        n += mrb2gval(mrb, this[mrb, i]);
+      }
+      
+      return n;
+    }
+    
+"""
+
+rm.puts """
+namespace MRuby {
+  public class ArrayWithContext : MRuby.Array {
+    public weak MRuby.Context mrb;
+	public ArrayWithContext(MRuby.Context mrb, MRb.Value act) {
+		base(act);
+		this.mrb = mrb;
+	}
+	
+	public new GLib.Value?[] to_native() {
+		return ((MRuby.Array)this).to_native(mrb);
+	}
+	
+	public new MRuby.Value @get(int i) {
+	  return ((MRuby.Array)this)[mrb, i];
+	}
+	
+	public GLib.Array<GLib.Value?> to_garray() {
+	  return ((MRuby.Array)this).to_garray(mrb);
+	}
+
 """
 
 METHS.each do |m|
@@ -277,17 +496,52 @@ METHS.find_all do |m| m.symbol.to_s =~ /^mrb_obj_/ end.each do |m|
   end
 end
 
+METHS.find_all do |m| m.symbol.to_s =~ /^mrb_ary_/ end.each do |m|
+  if !AEXC.index(m.symbol.gsub(/^mrb_ary_/,'').to_sym)
+    margs = m.args.clone
+    margs.shift
+    margs.unshift a = Arg.new
+    a.name = "mrb"
+    a.type = :"Context"
+    r.puts "    public #{rt=C_TYPES[TYPES[m.rtype].to_sym] || TYPES[m.rtype]} #{s=m.symbol.gsub(/^mrb_ary_/,'')}(#{margs.map do |a| "#{C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]} #{a.name.gsub(/^base$/, "_base")}" end.join(", ")}) {"
+    r.puts "\n      #{rt.to_s == "void" ? "" : "return "} mrb.ary_#{s}(this#{margs.length > 1 ? ", " :""} #{margs.map do |a| q = C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]; ((s = q == "MRuby.Value[]") ? "MRuby.vary2mrb(" : "") + a.name.gsub(/^base$/, "_base") + (s ? ")" : "") end[1..-1].join(", ")});\n"
+    r.puts("    }\n\n")
+  end
+end
+
+AEXC2 = AEXC.clone
+
+
+METHS.find_all do |m| m.symbol.to_s =~ /^mrb_ary_/ end.each do |m|
+  if !AEXC2.index(m.symbol.gsub(/^mrb_ary_/,'').to_sym)
+    margs = m.args.clone
+    margs.shift
+
+    rm.puts "    public new #{rt=C_TYPES[TYPES[m.rtype].to_sym] || TYPES[m.rtype]} #{s=m.symbol.gsub(/^mrb_ary_/,'')}(#{margs.map do |a| "#{C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]} #{a.name.gsub(/^base$/, "_base")}" end.join(", ")}) {"
+    rm.puts "\n      #{rt.to_s == "void" ? "" : "return "} mrb.ary_#{s}(this#{margs.length >= 1 ? ", " :""} #{margs.map do |a| q = C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]; ((s = q == "MRuby.Value[]") ? "MRuby.vary2mrb(" : "") + a.name.gsub(/^base$/, "_base") + (s ? ")" : "") end.join(", ")});\n"
+    rm.puts("    }\n\n")
+  end
+end
+
 c.puts "  }\n}\n\n"
 c.close
 
 o.puts "  }\n}\n\n"
 o.close
+
+r.puts "  }\n}\n\n"
+r.close
+
+rm.puts "  }\n}\n\n"
+rm.close
+
 puts "  }\n\n"
 puts <<-EOC
   public Value bool_value(bool val);
   public Value fixnum_value(int val);
   public Value float_value(Context mrb, float val);
   public Value nil_value();
+  public void* nil_p(Value v);
   public Value true_value();
   public Value false_value();
   public Value obj_value(void* obj);
@@ -299,6 +553,11 @@ puts <<-EOC
   public void* obj_ptr(Value o);
   public static int fixnum(Value v);
   public static bool test(Value v);  
+  public static void assert(void* a);
+  [CCode (cname="RARRAY_LEN")]
+  public static int RARRAY_LEN(MRb.Value a);
+  public static int type(MRb.Value v);
+  
 EOC
 
 [:none, :rest, :block, :any].each do |k|
