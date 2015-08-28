@@ -116,7 +116,8 @@ end
 c=File.open("src/context.vala","w")
 o = File.open("src/object.vala","w")
 r = File.open("src/array.vala", "w")
-rm = File.open("src/array_with_context.vala","w")
+s = File.open("src/string.vala", "w")
+
 puts "[CCode (cprefix = \"mrb_\", cheader_filename = \"mruby.h\", gir_namespace = \"MRb\", gir_version = \"0.1\")]"
 puts "namespace MRb {"
 puts """
@@ -170,10 +171,20 @@ puts "    public Context();"
 
 C_TYPES = {
   :mrb_sym=>"MRuby.Symbol",
-  :Value  =>"MRuby.Value",
+  :Value  =>"MRuby.Object",
   :"Value[]"=>"MRuby.Value[]",
   :"Context"=>"MRuby.Context",
   :TT=>"MRuby.TT"
+}
+
+METH_OVERRIDE = {
+	:obj_new => [:"MRuby.Object"],
+	:ary_new => [:"MRuby.Array", "new MRuby.Array.from(ret, this);"], 
+	:ary_new_from_values => [:"MRuby.Array", "new MRuby.Array.from(ret, this);"],
+	:obj_as_string => [:"MRuby.String", "new MRuby.String.from(ret, this);"],	
+	:str_new_cstr => [:"MRuby.String", "new MRuby.String.from(ret, this);"],	
+	:str_new_str => [:"MRuby.String", "new MRuby.String.from(ret, this);"],	
+	# :ary_join=> :"MRuby.String"
 }
 
 EXC = [
@@ -197,26 +208,51 @@ AEXC = [
   :new,
   :new_from_values,
   :new_capa,
-  :ref
+  :ref,
+  :set,
+  :get
 ]
+
+s.puts """
+namespace MRuby {
+  public class String : MRuby.Object {
+    public String.from(MRb.Value act, MRuby.Context? mrb = null) {
+      base.from(act, mrb);
+    }
+    
+    public String(Context mrb, string cstr) {
+	  base.from(mrb._base_.str_new_cstr(cstr), mrb);
+    }
+
+"""
+
+s.puts """
+
+  }
+}
+"""
+
+s.close
 
 o.puts """
 namespace MRuby {
   public class Object : MRuby.Value {
-    public Object(MRb.Value act) {
-      base(act);
+    public Object.from(MRb.Value act, MRuby.Context? mrb = null) {
+      base(act, mrb);
     }
     
-    public Object.create(Context mrb, void* cls, MRuby.Value[] argv) {
-      base(mrb.obj_new(cls, argv).actual);
+    public Object(Context mrb, void* cls, MRuby.Value[] argv) {
+      base(mrb.obj_new(cls, argv).actual, mrb);
     }
     
-    public Object dup(Context mrb) {
-      return (Object)mrb.obj_dup(this);
+    public Object dup(Context? c = null) {
+      unowned MRuby.Context mc = get_context(c);
+      return new Object.from(mc._base_.obj_dup(this.actual), mc);
     }
     
-    public Object clone(Context mrb) {
-      return (Object)mrb.obj_clone(this);
+    public Object clone(Context? c = null) {
+      unowned MRuby.Context mc = get_context(c);    
+      return new Object.from(mrb._base_.obj_clone(this.actual), mc);
     }    
 
 """
@@ -226,6 +262,12 @@ c.puts """
 namespace MRuby {
   using MRb;
   public class Context : MRb.Context {
+    public unowned MRb.Context _base_ {
+      get {
+		return (MRb.Context)this;
+      }
+    }
+  
     public new void define_method(string name, FuncCB cb) {
       new Class(object_class).define_method(this, name, cb);
     }
@@ -238,189 +280,43 @@ namespace MRuby {
       return new Module.get(this, name);
     }
     
-    public new MRuby.Value float_value(float val) {
-      return new MRuby.Value(((MRb.Context)this).float_value(val));
+    public new MRuby.Object float_value(float val) {
+      return new MRuby.Object.from(((MRb.Context)this).float_value(val), this);
     }
     
-    public new MRuby.Value cptr_value(void* val) {
-      return new MRuby.Value(((MRb.Context)this).cptr_value(val));
+    public new MRuby.Object cptr_value(void* val) {
+      return new MRuby.Object.from(((MRb.Context)this).cptr_value(val), this);
     }  
     
     public new int ary_len(MRuby.Value val) {
       return ((MRb.Context)this).ary_len(val.actual);
     }         
     
-    public new MRuby.Value obj_new(void* cls, MRuby.Value[] argv = {}) {
-      return new MRuby.Value(((MRb.Context)this).obj_new(cls, (MRb.Value[])argv));
+    public new MRuby.Object obj_new(void* cls, MRuby.Value[] argv = {}) {
+      return new MRuby.Object.from(((MRb.Context)this).obj_new(cls, (MRb.Value[])argv), this);
     }
     
-    public new MRuby.Value? load_string(string str) {
-      return new MRuby.Value(((MRb.Context)this).load_string(str));
-    }
-    
-     public new GLib.Array<GLib.Value?> get_args(GetArgsType[] types, int optional_at = -1, out MRuby.Value[] args = null) {
-      int a;
-      unowned MRb.Value[]? b;
-
-      int n = ((MRb.Context)this).get_args(\"*\", out b, out a);
-      
-      if (args != null) {
-        args = mrb2vary(b, a);
-      }
-      
-      var ary = new GLib.Array<GLib.Value?>();
-      
-      if (a > types.length) {
-        // TODO: Too many args passed?
-        
-        // raise?
-      }
-      
-      for (int i=0; i < types.length; i++) {
-        if (i >= a) { /* bad unless remainder were optional*/
-          if (optional_at >= 0 && optional_at <= i) {
-            return ary;
-          } else {
-            // TODO: should raise;
-            return ary;
-          }
-        }
-      
-      
-        GLib.Value? v;
-        switch (types[i]) {
-        case GetArgsType.INT:
-          v = MRb.fixnum(((MRb.Context)this).Integer(b[i]));
-          ary.append_val(v);
-          break;
-          
-        case GetArgsType.FLOAT:
-          v = ((MRb.Context)this).to_flo(b[i]);
-          ary.append_val(v);
-          break;           
-          
-        case GetArgsType.BOOL:
-          v = MRb.test(b[i]);
-          ary.append_val(v);
-          break;
-          
-        case GetArgsType.STRING:
-          v = (string)((MRb.Context)this).str_to_cstr(b[i]);
-          ary.append_val(v);
-          break;        
-          
-        case GetArgsType.OBJECT:
-          v = new MRuby.Object(b[i]);
-          ary.append_val(v); 
-          break;
-          
-        case GetArgsType.ARRAY:
-          ary.append_val(new MRuby.Array(b[i]));
-          break;
-          
-        default:
-          // TODO: throw
-          v = new MRuby.Value(b[i]);
-          break;
-        }
-      }
-      
-      return ary;
-    }
-    
-    public GLib.Array<GLib.Value?> get_native_typed_args(GetArgsType[] types, int optional=-1, out MRuby.Value[] args = null) {
-      int a;
-      unowned MRb.Value[]? b;
-
-      int n = ((MRb.Context)this).get_args(\"*\", out b, out a);
-      
-      if (args != null) {
-        args = mrb2vary(b, a);
-      }      
-      
-      var ary = new GLib.Array<GLib.Value?>();
-      
-      if (a > types.length) {
-        // TODO: Too many args passed?
-        
-        // raise?
-      }
-      
-      for (int i=0; i < types.length; i++) {
-        if (i >= a) { /* bad unless remainder were optional*/
-          if (optional >= 0 && optional <= i) {
-            return ary;
-          } else {
-            // TODO: should raise;
-            return ary;
-          }
-        }
-        
-        ary.append_val(mrb2gval(this, new MRuby.Value(b[i])));
-      }
-      
-      return ary;
-    }
-    
-    public GLib.Array<GLib.Value?> get_native_untyped_args(int optional=-1, out MRuby.Value[] args = null) {
-      int a;
-      unowned MRb.Value[]? b;
-
-      int n = ((MRb.Context)this).get_args(\"*\", out b, out a);
-      
-      if (args != null) {
-        args = mrb2vary(b, a);
-      }      
-      
-      var ary = new GLib.Array<GLib.Value?>();
-      
-      if (optional >= 0 && optional > a) {
-        // TODO: should raise
-        return ary;
-      }
-      
-      for (int i=0; i < a; i++) {
-        ary.append_val(mrb2gval(this, new MRuby.Value(b[i])));
-      }
-      
-      return ary;
-    }    
+    public new MRuby.Object? load_string(string str) {
+      return new MRuby.Object.from(((MRb.Context)this).load_string(str), this);
+    }  
        
 """
 
 r.puts """
 namespace MRuby {
-  public class Array : MRuby.Value {
-    public Array(MRb.Value act) {
-      base(act);
-    }
+  public class Array : MRuby.Object {
+	public Array(MRuby.Context mrb) {
+		base.from(((MRb.Context)mrb).ary_new(), mrb);
+	} 
   
-    public Array.create(MRuby.Context mrb) {
-      base(((MRb.Context)mrb).ary_new());
+    public Array.from(MRb.Value act, MRuby.Context? c = null) {
+      base.from(act, c);
     }
     
-    public Array.from_values(MRuby.Context mrb, MRuby.Value[] vals) {
-      base(((MRb.Context)mrb).ary_new_from_values(vals.length, MRuby.vary2mrb(vals)));
-    }
-    
-    public Array.from_gvalues(MRuby.Context mrb, GLib.Value?[] vals) {
-      MRuby.Value[] m = new MRuby.Value[0];
-      foreach(var v in vals) {
-        m += gval2mrb(mrb, v);
-      }
-      from_values(mrb, m);
-    }
-    
-    public Array.from_garray(MRuby.Context mrb, GLib.Array<GLib.Value?> g) {
-      MRuby.Value[] m = new MRuby.Value[0];    
-      for (int i=0; i < g.length; i++) {
-        m += gval2mrb(mrb, g.index(i));
-      }
-      from_values(mrb, m);
-    }
-    
-    public MRuby.Value get(MRuby.Context mrb, int idx) {
-      return mrb.ary_ref(this, idx);
+    public MRuby.Object context_get(int idx, MRuby.Context? c = null ) {
+      unowned MRuby.Context mc = get_context(c);
+      
+      return mc.ary_ref(this, idx);
     }
     
     public int length {
@@ -429,56 +325,69 @@ namespace MRuby {
       }
     }
     
-    public GLib.Array<GLib.Value?> to_garray(MRuby.Context mrb) {
-      GLib.Array<GLib.Value?> o = new GLib.Array<GLib.Value?>();
-      for (int i=0; i < length; i++) {
-        o.append_val(this[mrb, i]);
+    public int size {
+      get {
+        return MRb.RARRAY_LEN(this.actual);
       }
-      
-      return o;
-    }
+    }    
     
-    public GLib.Value?[] to_native(MRuby.Context mrb) {
-      GLib.Value?[] n = new GLib.Value?[0];
-      
-      for (int i=0; i < length; i++) {
-        n += mrb2gval(mrb, this[mrb, i]);
-      }
-      
-      return n;
-    }
+    public void context_set(int i, MRuby.Value val, MRuby.Context? ctx = null) {
+		unowned MRuby.Context mc = get_context(ctx);
+		mc.ary_set(this, i, val);
+    }  
     
-"""
-
-rm.puts """
-namespace MRuby {
-  public class ArrayWithContext : MRuby.Array {
-    public weak MRuby.Context mrb;
-	public ArrayWithContext(MRuby.Context mrb, MRb.Value act) {
-		base(act);
-		this.mrb = mrb;
-	}
-	
-	public new GLib.Value?[] to_native() {
-		return ((MRuby.Array)this).to_native(mrb);
-	}
-	
-	public new MRuby.Value @get(int i) {
-	  return ((MRuby.Array)this)[mrb, i];
-	}
-	
-	public GLib.Array<GLib.Value?> to_garray() {
-	  return ((MRuby.Array)this).to_garray(mrb);
+	public new void set(int i, MRuby.Value v) {
+		context_set(i, v);
 	}
 
+	
+	public new MRuby.Object get(int i) {
+		return context_get(i);
+	}
 """
+
+
 
 METHS.each do |m|
   puts "\n    [CCode (cheader_filename = \"#{m.header}\")]"
   puts "    public #{TYPES[m.rtype]} #{m.symbol.gsub(/^mrb_/,'')}(#{m.args.map do |a| "#{t=TYPES[a.type]; t == "Value[]" ? " [CCode (array_length=false)] "+t : t} #{a.name.gsub(/^base$/, "_base")}" end.join(", ")});"
-  if !EXC.index(m.symbol.gsub(/^mrb_/,'').to_sym)
-    c.puts "    public new #{rt=C_TYPES[TYPES[m.rtype].to_sym] || TYPES[m.rtype]} #{s=m.symbol.gsub(/^mrb_/,'')}(#{m.args.map do |a| "#{C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]} #{a.name.gsub(/^base$/, "_base")}" end.join(", ")}) {"
-    c.puts "\n      #{rt.to_s == "void" ? "" : "return "} #{C_TYPES[TYPES[m.rtype].to_sym] ? ( (z = rt == "MRuby.Value") ? "new MRuby.Value(" : "(#{rt})") : ""}((MRb.Context)this).#{s}(#{m.args.map do |a| q = C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]; ((s = q == "MRuby.Value[]") ? "MRuby.vary2mrb(" : "") + a.name.gsub(/^base$/, "_base") + (s ? ")" : "#{q == "MRuby.Value" ? ".actual" : ""}") end.join(", ")})#{z ? ")" : ""};\n"
+  if !EXC.index(q=m.symbol.gsub(/^mrb_/,'').to_sym)
+    rt       = (METH_OVERRIDE[q] ? METH_OVERRIDE[q][0] : nil) || C_TYPES[TYPES[m.rtype].to_sym] || TYPES[m.rtype]
+    atypes = []
+    args_dec = m.args.map do |a| "#{atypes << at=C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]; at == "MRuby.Object" ? "MRuby.Value" : at} #{a.name.gsub(/^base$/, "_base")}" end
+    
+    c.puts "    public new #{rt} #{s=m.symbol.gsub(/^mrb_/,'')}(#{args_dec.join(", ")}) {\n"
+
+    op = false;
+
+	if rt.to_s == "MRuby.Object"
+	  op = true;
+	  c.print("      return new MRuby.Object.from(")
+	elsif(METH_OVERRIDE[q.to_sym])
+	  c.print("      var ret = ")
+	elsif rt.to_s != "void"
+	  c.print("      return (#{rt})")
+	else
+	  c.print("      ")
+	end
+	i=0
+	invoke_args = m.args.map do |a|
+	  v = atypes[i] == "MRuby.Value[]" ? "(vary2mrb(#{a.name}))" : (atypes[i] == "MRuby.Object" ? "#{a.name.gsub(/^base$/, "_base")}.actual" : a.name.gsub(/^base$/, "_base"))
+	  i += 1
+	  v
+	end
+	
+	c.print "_base_.#{s}(#{invoke_args.join(", ")})"
+
+    c.print ", this)" if op
+    
+    c.print(";\n\n")    
+    
+    if METH_OVERRIDE[q]
+      c.print "      return #{METH_OVERRIDE[q][1]}\n\n" 
+    end
+    
+
     c.puts("    }\n\n")
   end
 end
@@ -487,11 +396,10 @@ METHS.find_all do |m| m.symbol.to_s =~ /^mrb_obj_/ end.each do |m|
   if !OEXC.index(m.symbol.gsub(/^mrb_obj_/,'').to_sym)
     margs = m.args.clone
     margs.shift
-    margs.unshift a = Arg.new
-    a.name = "mrb"
-    a.type = :"Context"
-    o.puts "    public #{rt=C_TYPES[TYPES[m.rtype].to_sym] || TYPES[m.rtype]} #{s=m.symbol.gsub(/^mrb_obj_/,'')}(#{margs.map do |a| "#{C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]} #{a.name.gsub(/^base$/, "_base")}" end.join(", ")}) {"
-    o.puts "\n      #{rt.to_s == "void" ? "" : "return "} mrb.obj_#{s}(this#{margs.length > 1 ? ", " :""} #{margs.map do |a| q = C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]; ((s = q == "MRuby.Value[]") ? "MRuby.vary2mrb(" : "") + a.name.gsub(/^base$/, "_base") + (s ? ")" : "") end[1..-1].join(", ")});\n"
+    q = m.symbol.gsub(/^mrb_/, '').to_sym
+    o.puts "    public #{(rt = (METH_OVERRIDE[q] ? METH_OVERRIDE[q][0] : nil) || C_TYPES[TYPES[m.rtype].to_sym] || TYPES[m.rtype]); rt} #{s=m.symbol.gsub(/^mrb_obj_/,'')}(#{margs.map do |a| "#{C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]} #{a.name.gsub(/^base$/, "_base")}" end.join(", ")+"#{m.args.length > 1 ? "," : ""} MRuby.Context? ctx = null"}) {"
+    o.puts "      unowned MRuby.Context mc = get_context(ctx);\n\n"
+    o.puts "\n      #{rt.to_s == "void" ? "" : "return "} mc.obj_#{s}(this#{margs.length >= 1 ? ", " :""} #{margs.map do |a| q = C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]; ((s = q == "MRuby.Value[]") ? "MRuby.vary2mrb(" : "") + a.name.gsub(/^base$/, "_base") + (s ? ")" : "") end.join(", ")});\n"
     o.puts("    }\n\n")
   end
 end
@@ -500,28 +408,15 @@ METHS.find_all do |m| m.symbol.to_s =~ /^mrb_ary_/ end.each do |m|
   if !AEXC.index(m.symbol.gsub(/^mrb_ary_/,'').to_sym)
     margs = m.args.clone
     margs.shift
-    margs.unshift a = Arg.new
-    a.name = "mrb"
-    a.type = :"Context"
-    r.puts "    public #{rt=C_TYPES[TYPES[m.rtype].to_sym] || TYPES[m.rtype]} #{s=m.symbol.gsub(/^mrb_ary_/,'')}(#{margs.map do |a| "#{C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]} #{a.name.gsub(/^base$/, "_base")}" end.join(", ")}) {"
-    r.puts "\n      #{rt.to_s == "void" ? "" : "return "} mrb.ary_#{s}(this#{margs.length > 1 ? ", " :""} #{margs.map do |a| q = C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]; ((s = q == "MRuby.Value[]") ? "MRuby.vary2mrb(" : "") + a.name.gsub(/^base$/, "_base") + (s ? ")" : "") end[1..-1].join(", ")});\n"
+    q = m.symbol.gsub(/^mrb_/, '').to_sym
+    r.puts "    public #{(rt = (METH_OVERRIDE[q] ? METH_OVERRIDE[q][0] : nil) || C_TYPES[TYPES[m.rtype].to_sym] || TYPES[m.rtype]); rt} #{s=m.symbol.gsub(/^mrb_ary_/,'')}(#{margs.map do |a| "#{C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]} #{a.name.gsub(/^base$/, "_base")}" end.join(", ")+"#{m.args.length > 1 ? "," : ""} MRuby.Context? ctx = null"}) {"
+    r.puts "      unowned MRuby.Context mc = get_context(ctx);\n\n"
+    r.puts "\n      #{rt.to_s == "void" ? "" : "return "} mc.ary_#{s}(this#{margs.length >= 1 ? ", " :""} #{margs.map do |a| q = C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]; ((s = q == "MRuby.Value[]") ? "MRuby.vary2mrb(" : "") + a.name.gsub(/^base$/, "_base") + (s ? ")" : "") end.join(", ")});\n"
     r.puts("    }\n\n")
   end
 end
 
-AEXC2 = AEXC.clone
 
-
-METHS.find_all do |m| m.symbol.to_s =~ /^mrb_ary_/ end.each do |m|
-  if !AEXC2.index(m.symbol.gsub(/^mrb_ary_/,'').to_sym)
-    margs = m.args.clone
-    margs.shift
-
-    rm.puts "    public new #{rt=C_TYPES[TYPES[m.rtype].to_sym] || TYPES[m.rtype]} #{s=m.symbol.gsub(/^mrb_ary_/,'')}(#{margs.map do |a| "#{C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]} #{a.name.gsub(/^base$/, "_base")}" end.join(", ")}) {"
-    rm.puts "\n      #{rt.to_s == "void" ? "" : "return "} mrb.ary_#{s}(this#{margs.length >= 1 ? ", " :""} #{margs.map do |a| q = C_TYPES[TYPES[a.type].to_sym] || TYPES[a.type]; ((s = q == "MRuby.Value[]") ? "MRuby.vary2mrb(" : "") + a.name.gsub(/^base$/, "_base") + (s ? ")" : "") end.join(", ")});\n"
-    rm.puts("    }\n\n")
-  end
-end
 
 c.puts "  }\n}\n\n"
 c.close
@@ -532,10 +427,8 @@ o.close
 r.puts "  }\n}\n\n"
 r.close
 
-rm.puts "  }\n}\n\n"
-rm.close
-
 puts "  }\n\n"
+
 puts <<-EOC
   public Value bool_value(bool val);
   public Value fixnum_value(int val);

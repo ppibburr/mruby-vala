@@ -1,19 +1,4 @@
-namespace MRuby {
-  
-  public enum GetArgsType {
-    STRING,
-    INT,
-    FLOAT,
-    BOOL,
-    ARRAY,
-    DATA,
-    OBJECT,
-    HASH,
-    SYMBOL,
-    BLOCK,
-    REST;
-  }   
-  
+namespace MRuby {  
   public static void* cptr(MRuby.Value val) {
     return MRb.cptr(val.actual);
   }
@@ -174,9 +159,29 @@ namespace MRuby {
   
   public class Value : GLib.Object {
     public weak MRb.Value actual;
-    public Value(MRb.Value act) {
+    public weak MRuby.Context mrb;
+    public Value(MRb.Value act, MRuby.Context? mrb = null) {
       this.actual = act;
+      if (mrb != null) {
+        this.mrb = mrb;
+	  }
     }
+   
+    public string to_string(MRuby.Context? c = null) {
+		unowned MRuby.Context mc = get_context(c);
+		return (string)mc.str_to_cstr(mc.obj_as_string(this)); 
+	}
+   
+    public unowned MRuby.Context? get_context(MRuby.Context? c) {
+      unowned MRuby.Context mc;
+      if (c != null) {
+		mc = c;
+      } else {
+        mc = mrb;
+      }
+      
+      return mc;		
+	}
   }
   
   public struct Symbol : MRb.mrb_sym {
@@ -193,6 +198,6 @@ namespace MRuby {
   }
   
   public MRuby.Object obj_value(void* obj) {
-    return new MRuby.Object(MRb.obj_value(obj));
+    return new MRuby.Object.from(MRb.obj_value(obj));
   }  
 }

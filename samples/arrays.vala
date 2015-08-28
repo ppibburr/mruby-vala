@@ -2,15 +2,16 @@
 void main() {
 	var mrb = new MRuby.Context();
 	mrb.define_method("foo", (mrb)=> {
-		var a = new MRuby.Array.create(mrb);
-		var m = new MRuby.ArrayWithContext(mrb, a.actual);
+		var a = new MRuby.Array(mrb);
 
-		m[0] = mrb.str_new_cstr("foo");
-		m[1] = MRuby.true_value();
+		a[0] = new MRuby.String(mrb, "foo");
+		a[1] = new MRuby.Object.from(MRb.true_value(), mrb);
 		
-		print("%s\n", (string)m.to_native()[0]);
+		foreach (var v in a) {
+			print("%s\n", v.to_string());
+		}
 		
-		return m;
+		return a;
 	});
 	mrb.load_string("p foo();");
 }

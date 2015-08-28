@@ -1,36 +1,18 @@
 
 namespace MRuby {
-  public class Array : MRuby.Value {
-    public Array(MRb.Value act) {
-      base(act);
-    }
+  public class Array : MRuby.Object {
+	public Array(MRuby.Context mrb) {
+		base.from(((MRb.Context)mrb).ary_new(), mrb);
+	} 
   
-    public Array.create(MRuby.Context mrb) {
-      base(((MRb.Context)mrb).ary_new());
+    public Array.from(MRb.Value act, MRuby.Context? c = null) {
+      base.from(act, c);
     }
     
-    public Array.from_values(MRuby.Context mrb, MRuby.Value[] vals) {
-      base(((MRb.Context)mrb).ary_new_from_values(vals.length, MRuby.vary2mrb(vals)));
-    }
-    
-    public Array.from_gvalues(MRuby.Context mrb, GLib.Value?[] vals) {
-      MRuby.Value[] m = new MRuby.Value[0];
-      foreach(var v in vals) {
-        m += gval2mrb(mrb, v);
-      }
-      from_values(mrb, m);
-    }
-    
-    public Array.from_garray(MRuby.Context mrb, GLib.Array<GLib.Value?> g) {
-      MRuby.Value[] m = new MRuby.Value[0];    
-      for (int i=0; i < g.length; i++) {
-        m += gval2mrb(mrb, g.index(i));
-      }
-      from_values(mrb, m);
-    }
-    
-    public MRuby.Value get(MRuby.Context mrb, int idx) {
-      return mrb.ary_ref(this, idx);
+    public MRuby.Object context_get(int idx, MRuby.Context? c = null ) {
+      unowned MRuby.Context mc = get_context(c);
+      
+      return mc.ary_ref(this, idx);
     }
     
     public int length {
@@ -39,78 +21,93 @@ namespace MRuby {
       }
     }
     
-    public GLib.Array<GLib.Value?> to_garray(MRuby.Context mrb) {
-      GLib.Array<GLib.Value?> o = new GLib.Array<GLib.Value?>();
-      for (int i=0; i < length; i++) {
-        o.append_val(this[mrb, i]);
+    public int size {
+      get {
+        return MRb.RARRAY_LEN(this.actual);
       }
-      
-      return o;
-    }
+    }    
     
-    public GLib.Value?[] to_native(MRuby.Context mrb) {
-      GLib.Value?[] n = new GLib.Value?[0];
-      
-      for (int i=0; i < length; i++) {
-        n += mrb2gval(mrb, this[mrb, i]);
-      }
-      
-      return n;
-    }
+    public void context_set(int i, MRuby.Value val, MRuby.Context? ctx = null) {
+		unowned MRuby.Context mc = get_context(ctx);
+		mc.ary_set(this, i, val);
+    }  
     
-    public void concat(MRuby.Context mrb, MRuby.Value foo2) {
+	public new void set(int i, MRuby.Value v) {
+		context_set(i, v);
+	}
 
-       mrb.ary_concat(this,  foo2);
+	
+	public new MRuby.Object get(int i) {
+		return context_get(i);
+	}
+    public void concat(MRuby.Object foo2, MRuby.Context? ctx = null) {
+      unowned MRuby.Context mc = get_context(ctx);
+
+
+       mc.ary_concat(this,  foo2);
     }
 
-    public MRuby.Value splat(MRuby.Context mrb) {
+    public MRuby.Object splat( MRuby.Context? ctx = null) {
+      unowned MRuby.Context mc = get_context(ctx);
 
-      return  mrb.ary_splat(this );
+
+      return  mc.ary_splat(this );
     }
 
-    public void push(MRuby.Context mrb, MRuby.Value foo2) {
+    public void push(MRuby.Object foo2, MRuby.Context? ctx = null) {
+      unowned MRuby.Context mc = get_context(ctx);
 
-       mrb.ary_push(this,  foo2);
+
+       mc.ary_push(this,  foo2);
     }
 
-    public MRuby.Value pop(MRuby.Context mrb) {
+    public MRuby.Object pop( MRuby.Context? ctx = null) {
+      unowned MRuby.Context mc = get_context(ctx);
 
-      return  mrb.ary_pop(this );
+
+      return  mc.ary_pop(this );
     }
 
-    public void set(MRuby.Context mrb, int n, MRuby.Value val) {
+    public void replace(MRuby.Object b, MRuby.Context? ctx = null) {
+      unowned MRuby.Context mc = get_context(ctx);
 
-       mrb.ary_set(this,  n, val);
+
+       mc.ary_replace(this,  b);
     }
 
-    public void replace(MRuby.Context mrb, MRuby.Value b) {
+    public MRuby.Object unshift(MRuby.Object item, MRuby.Context? ctx = null) {
+      unowned MRuby.Context mc = get_context(ctx);
 
-       mrb.ary_replace(this,  b);
+
+      return  mc.ary_unshift(this,  item);
     }
 
-    public MRuby.Value unshift(MRuby.Context mrb, MRuby.Value item) {
+    public MRuby.Object shift( MRuby.Context? ctx = null) {
+      unowned MRuby.Context mc = get_context(ctx);
 
-      return  mrb.ary_unshift(this,  item);
+
+      return  mc.ary_shift(this );
     }
 
-    public MRuby.Value shift(MRuby.Context mrb) {
+    public MRuby.Object clear( MRuby.Context? ctx = null) {
+      unowned MRuby.Context mc = get_context(ctx);
 
-      return  mrb.ary_shift(this );
+
+      return  mc.ary_clear(this );
     }
 
-    public MRuby.Value clear(MRuby.Context mrb) {
+    public MRuby.Object join(MRuby.Object sep, MRuby.Context? ctx = null) {
+      unowned MRuby.Context mc = get_context(ctx);
 
-      return  mrb.ary_clear(this );
+
+      return  mc.ary_join(this,  sep);
     }
 
-    public MRuby.Value join(MRuby.Context mrb, MRuby.Value sep) {
+    public MRuby.Object resize(int len, MRuby.Context? ctx = null) {
+      unowned MRuby.Context mc = get_context(ctx);
 
-      return  mrb.ary_join(this,  sep);
-    }
 
-    public MRuby.Value resize(MRuby.Context mrb, int len) {
-
-      return  mrb.ary_resize(this,  len);
+      return  mc.ary_resize(this,  len);
     }
 
   }
