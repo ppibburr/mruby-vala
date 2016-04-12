@@ -1,11 +1,11 @@
 prefix=/usr
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib/
-includedir=${prefix}/include/
+includedir=${prefix}/include/mruby-shared/
 
-Name: libmruby
+Name: libmruby-shared
 Description: Embedded Ruby (mruby)
 Version: 1.1.0
-Libs: -L${libdir} -lmruby
+Libs: -L${libdir} -lmruby-shared
 Libs.private: -lm
 Cflags: -I${includedir}

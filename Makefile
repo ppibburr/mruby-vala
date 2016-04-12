@@ -1,10 +1,11 @@
 all:
 	make mruby
-	valac src/mruby.vala  src/array.vala src/string.vala src/object.vala src/module.vala src/context.vala --vapidir=./vapi --pkg mruby --pkg gobject-introspection-1.0 -H mruby_vala.h -g -X -fPIC --library=mruby-vala --gir=MRuby-0.1.gir -o libmruby-vala.so -X -shared -X -fPIC -X -lm -X -lmruby
+	valac src/mruby.vala  src/array.vala src/string.vala src/object.vala src/module.vala src/context.vala --vapidir=./vapi --pkg mruby --pkg gobject-introspection-1.0 -H mruby_vala.h -g -X -fPIC --library=mruby-vala --gir=MRuby-0.1.gir -o libmruby-vala.so -X -shared -X -fPIC -X -lm -X -lmruby-shared
 	make gir
 
 gir:
 	g-ir-compiler --shared-library=libmruby-vala.so --output=MRuby-0.1.typelib MRuby-0.1.gir --includedir=./
+	g-ir-compiler --shared-library=mruby-shared MRb-0.1.gir -o MRb-0.1.typelib
 
 clean:
 	rm *.so
