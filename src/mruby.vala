@@ -40,7 +40,7 @@ namespace MRuby {
   }
   
   public static TT type(Value v) {
-    return (TT)MRb.type(v.actual);
+    return (TT)(MRb.type(v.actual) - 1);
   }
   
   public static void* nil_p(Value v) {
@@ -97,7 +97,8 @@ namespace MRuby {
 	}
   
   public static GLib.Value? mrb2gval(Context mrb, MRuby.Value m) {
-	  switch (type(m)) {
+	  print(@"$(type(m)+1)\n");
+	  switch (type(m)+1) {
 	  case TT.STRING:
       return (string)mrb.str_to_cstr(m);
 	  case TT.FIXNUM:
@@ -114,6 +115,7 @@ namespace MRuby {
       return null;
       
     case TT.OBJECT:
+      print("OBJECT\n");
       return (MRuby.Object)m;
     case TT.ARRAY:
       return (MRuby.Array)m; 
@@ -188,7 +190,7 @@ namespace MRuby {
     
   }
 
-  public delegate unowned GLib.Value FuncCB(Context mrb, MRuby.Value self);
+  public delegate unowned GLib.Value? FuncCB(Context mrb, MRuby.Value self);
 
   public class MRbFuncEnv : GLib.Object {
     public FuncCB fun;

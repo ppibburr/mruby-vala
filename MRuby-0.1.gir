@@ -1,0 +1,3442 @@
+<?xml version="1.0"?>
+<repository version="1.2" xmlns="http://www.gtk.org/introspection/core/1.0" xmlns:c="http://www.gtk.org/introspection/c/1.0" xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+<include name="GObject" version="2.0"/>
+<include name="MRb" version="0.1"/>
+<package name="mruby-vala"/>
+<c:include name="mruby_vala.h"/>
+<namespace name="MRuby" version="0.1" c:prefix="MRuby">
+	<enumeration name="TT" c:type="MRubyTT" glib:type-name="MRubyTT" glib:get-type="mruby_tt_get_type">
+		<member name="false" c:identifier="MRUBY_TT_FALSE" value="0"/>
+		<member name="free" c:identifier="MRUBY_TT_FREE" value="0"/>
+		<member name="true" c:identifier="MRUBY_TT_TRUE" value="1"/>
+		<member name="fixnum" c:identifier="MRUBY_TT_FIXNUM" value="2"/>
+		<member name="symbol" c:identifier="MRUBY_TT_SYMBOL" value="3"/>
+		<member name="undef" c:identifier="MRUBY_TT_UNDEF" value="4"/>
+		<member name="float" c:identifier="MRUBY_TT_FLOAT" value="5"/>
+		<member name="cptr" c:identifier="MRUBY_TT_CPTR" value="6"/>
+		<member name="object" c:identifier="MRUBY_TT_OBJECT" value="7"/>
+		<member name="class" c:identifier="MRUBY_TT_CLASS" value="8"/>
+		<member name="module" c:identifier="MRUBY_TT_MODULE" value="9"/>
+		<member name="iclass" c:identifier="MRUBY_TT_ICLASS" value="10"/>
+		<member name="sclass" c:identifier="MRUBY_TT_SCLASS" value="11"/>
+		<member name="proc" c:identifier="MRUBY_TT_PROC" value="12"/>
+		<member name="array" c:identifier="MRUBY_TT_ARRAY" value="13"/>
+		<member name="hash" c:identifier="MRUBY_TT_HASH" value="14"/>
+		<member name="string" c:identifier="MRUBY_TT_STRING" value="15"/>
+		<member name="range" c:identifier="MRUBY_TT_RANGE" value="16"/>
+		<member name="exception" c:identifier="MRUBY_TT_EXCEPTION" value="17"/>
+		<member name="file" c:identifier="MRUBY_TT_FILE" value="18"/>
+		<member name="env" c:identifier="MRUBY_TT_ENV" value="19"/>
+		<member name="data" c:identifier="MRUBY_TT_DATA" value="20"/>
+		<member name="fiber" c:identifier="MRUBY_TT_FIBER" value="21"/>
+		<member name="maxdefine" c:identifier="MRUBY_TT_MAXDEFINE" value="22"/>
+	</enumeration>
+	<class name="Value" c:type="MRubyValue" glib:type-name="MRubyValue" glib:get-type="mruby_value_get_type" glib:type-struct="ValueClass" parent="GObject.Object">
+		<field name="parent_instance">
+			<type name="GObject.Object" c:type="GObject"/>
+		</field>
+		<field name="priv">
+			<type name="ValuePrivate" c:type="MRubyValuePrivate*"/>
+		</field>
+		<field name="actual">
+			<type name="MRb.Value" c:type="mrb_value"/>
+		</field>
+		<field name="mrb">
+			<type name="MRuby.Context" c:type="MRubyContext*"/>
+		</field>
+		<constructor name="new" c:identifier="mruby_value_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Value" c:type="MRubyValue*"/>
+			</return-value>
+			<parameters>
+				<parameter name="act" transfer-ownership="none">
+					<type name="MRb.Value" c:type="mrb_value"/>
+				</parameter>
+				<parameter name="mrb" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<method name="to_string" c:identifier="mruby_value_to_string">
+			<return-value transfer-ownership="full">
+				<type name="utf8" c:type="gchar*"/>
+			</return-value>
+			<parameters>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="get_context" c:identifier="mruby_value_get_context">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="MRuby.Context" c:type="MRubyContext*"/>
+			</return-value>
+			<parameters>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+	</class>
+	<record name="ValueClass" c:type="MRubyValueClass" glib:is-gtype-struct-for="Value">
+		<field name="parent_class">
+			<type name="GObject.ObjectClass" c:type="GObjectClass"/>
+		</field>
+	</record>
+	<record name="ValuePrivate" c:type="MRubyValuePrivate" disguised="1"/>
+	<class name="MRbFuncEnv" c:type="MRubyMRbFuncEnv" glib:type-name="MRubyMRbFuncEnv" glib:get-type="mruby_mrb_func_env_get_type" glib:type-struct="MRbFuncEnvClass" parent="GObject.Object">
+		<field name="parent_instance">
+			<type name="GObject.Object" c:type="GObject"/>
+		</field>
+		<field name="priv">
+			<type name="MRbFuncEnvPrivate" c:type="MRubyMRbFuncEnvPrivate*"/>
+		</field>
+		<field name="fun">
+			<type name="MRuby.FuncCB" c:type="MRubyFuncCB"/>
+		</field>
+		<constructor name="new" c:identifier="mruby_mrb_func_env_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.MRbFuncEnv" c:type="MRubyMRbFuncEnv*"/>
+			</return-value>
+			<parameters>
+				<parameter name="cb" transfer-ownership="none" closure="1" scope="call">
+					<type name="MRuby.FuncCB" c:type="MRubyFuncCB"/>
+				</parameter>
+				<parameter name="cb_target" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+	</class>
+	<record name="MRbFuncEnvClass" c:type="MRubyMRbFuncEnvClass" glib:is-gtype-struct-for="MRbFuncEnv">
+		<field name="parent_class">
+			<type name="GObject.ObjectClass" c:type="GObjectClass"/>
+		</field>
+	</record>
+	<record name="MRbFuncEnvPrivate" c:type="MRubyMRbFuncEnvPrivate" disguised="1"/>
+	<class name="Array" c:type="MRubyArray" glib:type-name="MRubyArray" glib:get-type="mruby_array_get_type" glib:type-struct="ArrayClass" parent="MRuby.Object">
+		<field name="parent_instance">
+			<type name="MRuby.Object" c:type="MRubyObject"/>
+		</field>
+		<field name="priv">
+			<type name="ArrayPrivate" c:type="MRubyArrayPrivate*"/>
+		</field>
+		<constructor name="new" c:identifier="mruby_array_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Array" c:type="MRubyArray*"/>
+			</return-value>
+			<parameters>
+				<parameter name="mrb" transfer-ownership="none">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<constructor name="from" c:identifier="mruby_array_new_from">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Array" c:type="MRubyArray*"/>
+			</return-value>
+			<parameters>
+				<parameter name="act" transfer-ownership="none">
+					<type name="MRb.Value" c:type="mrb_value"/>
+				</parameter>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<method name="context_get" c:identifier="mruby_array_context_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="idx" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="context_set" c:identifier="mruby_array_context_set">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="i" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="val" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="set" c:identifier="mruby_array_set">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="i" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="v" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="get" c:identifier="mruby_array_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="i" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="concat" c:identifier="mruby_array_concat">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Object" c:type="MRubyObject*"/>
+				</parameter>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="splat" c:identifier="mruby_array_splat">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="push" c:identifier="mruby_array_push">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Object" c:type="MRubyObject*"/>
+				</parameter>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="pop" c:identifier="mruby_array_pop">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="replace" c:identifier="mruby_array_replace">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="b" transfer-ownership="none">
+					<type name="MRuby.Object" c:type="MRubyObject*"/>
+				</parameter>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="unshift" c:identifier="mruby_array_unshift">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="item" transfer-ownership="none">
+					<type name="MRuby.Object" c:type="MRubyObject*"/>
+				</parameter>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="shift" c:identifier="mruby_array_shift">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="clear" c:identifier="mruby_array_clear">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="join" c:identifier="mruby_array_join">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="sep" transfer-ownership="none">
+					<type name="MRuby.Object" c:type="MRubyObject*"/>
+				</parameter>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="resize" c:identifier="mruby_array_resize">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="len" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<property name="length">
+			<type name="gint" c:type="gint"/>
+		</property>
+		<method name="get_length" c:identifier="mruby_array_get_length">
+			<return-value transfer-ownership="none">
+				<type name="gint" c:type="gint"/>
+			</return-value>
+		</method>
+		<property name="size">
+			<type name="gint" c:type="gint"/>
+		</property>
+		<method name="get_size" c:identifier="mruby_array_get_size">
+			<return-value transfer-ownership="none">
+				<type name="gint" c:type="gint"/>
+			</return-value>
+		</method>
+	</class>
+	<record name="ArrayClass" c:type="MRubyArrayClass" glib:is-gtype-struct-for="Array">
+		<field name="parent_class">
+			<type name="MRuby.ObjectClass" c:type="MRubyObjectClass"/>
+		</field>
+	</record>
+	<record name="ArrayPrivate" c:type="MRubyArrayPrivate" disguised="1"/>
+	<class name="String" c:type="MRubyString" glib:type-name="MRubyString" glib:get-type="mruby_string_get_type" glib:type-struct="StringClass" parent="MRuby.Object">
+		<field name="parent_instance">
+			<type name="MRuby.Object" c:type="MRubyObject"/>
+		</field>
+		<field name="priv">
+			<type name="StringPrivate" c:type="MRubyStringPrivate*"/>
+		</field>
+		<constructor name="from" c:identifier="mruby_string_new_from">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.String" c:type="MRubyString*"/>
+			</return-value>
+			<parameters>
+				<parameter name="act" transfer-ownership="none">
+					<type name="MRb.Value" c:type="mrb_value"/>
+				</parameter>
+				<parameter name="mrb" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<constructor name="new" c:identifier="mruby_string_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.String" c:type="MRubyString*"/>
+			</return-value>
+			<parameters>
+				<parameter name="mrb" transfer-ownership="none">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+				<parameter name="cstr" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+	</class>
+	<record name="StringClass" c:type="MRubyStringClass" glib:is-gtype-struct-for="String">
+		<field name="parent_class">
+			<type name="MRuby.ObjectClass" c:type="MRubyObjectClass"/>
+		</field>
+	</record>
+	<record name="StringPrivate" c:type="MRubyStringPrivate" disguised="1"/>
+	<class name="Object" c:type="MRubyObject" glib:type-name="MRubyObject" glib:get-type="mruby_object_get_type" glib:type-struct="ObjectClass" parent="MRuby.Value">
+		<field name="parent_instance">
+			<type name="MRuby.Value" c:type="MRubyValue"/>
+		</field>
+		<field name="priv">
+			<type name="ObjectPrivate" c:type="MRubyObjectPrivate*"/>
+		</field>
+		<constructor name="from" c:identifier="mruby_object_new_from">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="act" transfer-ownership="none">
+					<type name="MRb.Value" c:type="mrb_value"/>
+				</parameter>
+				<parameter name="mrb" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<constructor name="new" c:identifier="mruby_object_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="mrb" transfer-ownership="none">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+				<parameter name="cls" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="argv" transfer-ownership="none">
+					<array length="3">
+						<type name="MRuby.Value" c:type="MRubyValue*"/>
+					</array>
+				</parameter>
+				<parameter name="argv_length1" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<method name="dup" c:identifier="mruby_object_dup">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="clone" c:identifier="mruby_object_clone">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="as_string" c:identifier="mruby_object_as_string">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.String" c:type="MRubyString*"/>
+			</return-value>
+			<parameters>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="instance_variables" c:identifier="mruby_object_instance_variables">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="respond_to" c:identifier="mruby_object_respond_to">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="mid" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="to_sym" c:identifier="mruby_object_to_sym">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+			</return-value>
+			<parameters>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="eq" c:identifier="mruby_object_eq">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Object" c:type="MRubyObject*"/>
+				</parameter>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="equal" c:identifier="mruby_object_equal">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Object" c:type="MRubyObject*"/>
+				</parameter>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="classname" c:identifier="mruby_object_classname">
+			<return-value transfer-ownership="full">
+				<type name="utf8" c:type="gchar*"/>
+			</return-value>
+			<parameters>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="class" c:identifier="mruby_object_class">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="is_kind_of" c:identifier="mruby_object_is_kind_of">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="inspect" c:identifier="mruby_object_inspect">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="is_instance_of" c:identifier="mruby_object_is_instance_of">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="ctx" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</method>
+	</class>
+	<record name="ObjectClass" c:type="MRubyObjectClass" glib:is-gtype-struct-for="Object">
+		<field name="parent_class">
+			<type name="MRuby.ValueClass" c:type="MRubyValueClass"/>
+		</field>
+	</record>
+	<record name="ObjectPrivate" c:type="MRubyObjectPrivate" disguised="1"/>
+	<class name="Module" c:type="MRubyModule" glib:type-name="MRubyModule" glib:get-type="mruby_module_get_type" glib:type-struct="ModuleClass" parent="GObject.Object">
+		<field name="parent_instance">
+			<type name="GObject.Object" c:type="GObject"/>
+		</field>
+		<field name="priv">
+			<type name="ModulePrivate" c:type="MRubyModulePrivate*"/>
+		</field>
+		<method name="get_value" c:identifier="mruby_module_get_value">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Value" c:type="MRubyValue*"/>
+			</return-value>
+		</method>
+		<constructor name="new" c:identifier="mruby_module_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Module" c:type="MRubyModule*"/>
+			</return-value>
+			<parameters>
+				<parameter name="pointer" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<constructor name="from_value" c:identifier="mruby_module_new_from_value">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Module" c:type="MRubyModule*"/>
+			</return-value>
+			<parameters>
+				<parameter name="value" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<constructor name="define" c:identifier="mruby_module_new_define">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Module" c:type="MRubyModule*"/>
+			</return-value>
+			<parameters>
+				<parameter name="mrb" transfer-ownership="none">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="under" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Module" c:type="MRubyModule*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<constructor name="create" c:identifier="mruby_module_new_create">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Module" c:type="MRubyModule*"/>
+			</return-value>
+			<parameters>
+				<parameter name="mrb" transfer-ownership="none">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<constructor name="get" c:identifier="mruby_module_new_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Module" c:type="MRubyModule*"/>
+			</return-value>
+			<parameters>
+				<parameter name="mrb" transfer-ownership="none">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<method name="define_method" c:identifier="mruby_module_define_method">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="mrb" transfer-ownership="none">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="cb" transfer-ownership="none" closure="3" scope="call">
+					<type name="MRuby.FuncCB" c:type="MRubyFuncCB"/>
+				</parameter>
+				<parameter name="cb_target" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="define_static_method" c:identifier="mruby_module_define_static_method">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="mrb" transfer-ownership="none">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="cb" transfer-ownership="none" closure="3" scope="call">
+					<type name="MRuby.FuncCB" c:type="MRubyFuncCB"/>
+				</parameter>
+				<parameter name="cb_target" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<function name="invoke_func_with_env" c:identifier="mruby_module_invoke_func_with_env">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Value" c:type="MRubyValue*"/>
+			</return-value>
+			<parameters>
+				<parameter name="mrb" transfer-ownership="none">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+				<parameter name="self" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</function>
+		<property name="pointer" writable="1" construct="1">
+			<type name="gpointer" c:type="void*"/>
+		</property>
+		<method name="get_pointer" c:identifier="mruby_module_get_pointer">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+		</method>
+		<method name="set_pointer" c:identifier="mruby_module_set_pointer">
+			<return-value transfer-ownership="none">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="value" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+	</class>
+	<record name="ModuleClass" c:type="MRubyModuleClass" glib:is-gtype-struct-for="Module">
+		<field name="parent_class">
+			<type name="GObject.ObjectClass" c:type="GObjectClass"/>
+		</field>
+	</record>
+	<record name="ModulePrivate" c:type="MRubyModulePrivate" disguised="1"/>
+	<class name="Class" c:type="MRubyClass" glib:type-name="MRubyClass" glib:get-type="mruby_class_get_type" glib:type-struct="ClassClass" parent="MRuby.Module">
+		<field name="parent_instance">
+			<type name="MRuby.Module" c:type="MRubyModule"/>
+		</field>
+		<field name="priv">
+			<type name="ClassPrivate" c:type="MRubyClassPrivate*"/>
+		</field>
+		<constructor name="new" c:identifier="mruby_class_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Class" c:type="MRubyClass*"/>
+			</return-value>
+			<parameters>
+				<parameter name="pointer" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<constructor name="define" c:identifier="mruby_class_new_define">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Class" c:type="MRubyClass*"/>
+			</return-value>
+			<parameters>
+				<parameter name="mrb" transfer-ownership="none">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="super" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Class" c:type="MRubyClass*"/>
+				</parameter>
+				<parameter name="under" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Module" c:type="MRubyModule*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<constructor name="create" c:identifier="mruby_class_new_create">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Class" c:type="MRubyClass*"/>
+			</return-value>
+			<parameters>
+				<parameter name="mrb" transfer-ownership="none">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+				<parameter name="super" transfer-ownership="none" allow-none="1">
+					<type name="MRuby.Class" c:type="MRubyClass*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<constructor name="get" c:identifier="mruby_class_new_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Class" c:type="MRubyClass*"/>
+			</return-value>
+			<parameters>
+				<parameter name="mrb" transfer-ownership="none">
+					<type name="MRuby.Context" c:type="MRubyContext*"/>
+				</parameter>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+	</class>
+	<record name="ClassClass" c:type="MRubyClassClass" glib:is-gtype-struct-for="Class">
+		<field name="parent_class">
+			<type name="MRuby.ModuleClass" c:type="MRubyModuleClass"/>
+		</field>
+	</record>
+	<record name="ClassPrivate" c:type="MRubyClassPrivate" disguised="1"/>
+	<record name="Context">
+		<method name="args" c:identifier="mruby_context_args">
+			<return-value transfer-ownership="full">
+				<array length="1">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</array>
+			</return-value>
+			<parameters>
+				<parameter name="len" direction="out" transfer-ownership="full">
+					<type name="gint" c:type="gint*"/>
+				</parameter>
+				<parameter name="result_length1" direction="out" transfer-ownership="none">
+					<type name="gint" c:type="gint*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="define_method" c:identifier="mruby_context_define_method">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="cb" transfer-ownership="none" closure="2" scope="call">
+					<type name="MRuby.FuncCB" c:type="MRubyFuncCB"/>
+				</parameter>
+				<parameter name="cb_target" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="class_get" c:identifier="mruby_context_class_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Class" c:type="MRubyClass*"/>
+			</return-value>
+			<parameters>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="module_get" c:identifier="mruby_context_module_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Module" c:type="MRubyModule*"/>
+			</return-value>
+			<parameters>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="float_value" c:identifier="mruby_context_float_value">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="val" transfer-ownership="none">
+					<type name="gfloat" c:type="gfloat"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="cptr_value" c:identifier="mruby_context_cptr_value">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="val" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ary_len" c:identifier="mruby_context_ary_len">
+			<return-value transfer-ownership="full">
+				<type name="gint" c:type="gint"/>
+			</return-value>
+			<parameters>
+				<parameter name="val" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="obj_new" c:identifier="mruby_context_obj_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="cls" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="argv" transfer-ownership="none">
+					<array length="2">
+						<type name="MRuby.Value" c:type="MRubyValue*"/>
+					</array>
+				</parameter>
+				<parameter name="argv_length1" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="load_string" c:identifier="mruby_context_load_string">
+			<return-value transfer-ownership="full" allow-none="1">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="sys_fail" c:identifier="mruby_context_sys_fail">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="mesg" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="exc_new_str" c:identifier="mruby_context_exc_new_str">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="exc_backtrace" c:identifier="mruby_context_exc_backtrace">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="exc" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="get_backtrace" c:identifier="mruby_context_get_backtrace">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+		</method>
+		<method name="f_raise" c:identifier="mruby_context_f_raise">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_concat" c:identifier="mruby_context_str_concat">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_plus" c:identifier="mruby_context_str_plus">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ptr_to_str" c:identifier="mruby_context_ptr_to_str">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="obj_as_string" c:identifier="mruby_context_obj_as_string">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.String" c:type="MRubyString*"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_resize" c:identifier="mruby_context_str_resize">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="len" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_substr" c:identifier="mruby_context_str_substr">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="beg" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="len" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="string_type" c:identifier="mruby_context_string_type">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="check_string_type" c:identifier="mruby_context_check_string_type">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_buf_new" c:identifier="mruby_context_str_buf_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="capa" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="string_value_ptr" c:identifier="mruby_context_string_value_ptr">
+			<return-value transfer-ownership="full">
+				<type name="utf8" c:type="gchar*"/>
+			</return-value>
+			<parameters>
+				<parameter name="ptr" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_dup" c:identifier="mruby_context_str_dup">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_intern" c:identifier="mruby_context_str_intern">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="self" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_to_inum" c:identifier="mruby_context_str_to_inum">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="_base" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="badcheck" transfer-ownership="none">
+					<type name="gboolean" c:type="gboolean"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_to_str" c:identifier="mruby_context_str_to_str">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_equal" c:identifier="mruby_context_str_equal">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="str1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="str2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_cat" c:identifier="mruby_context_str_cat">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="ptr" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="len" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_cat_cstr" c:identifier="mruby_context_str_cat_cstr">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="ptr" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_cat_str" c:identifier="mruby_context_str_cat_str">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="str2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_append" c:identifier="mruby_context_str_append">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="str2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_to_cstr" c:identifier="mruby_context_str_to_cstr">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="gchar*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_pool" c:identifier="mruby_context_str_pool">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_hash" c:identifier="mruby_context_str_hash">
+			<return-value transfer-ownership="full">
+				<type name="gint" c:type="gint"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_dump" c:identifier="mruby_context_str_dump">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_inspect" c:identifier="mruby_context_str_inspect">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="str" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="noregexp" c:identifier="mruby_context_noregexp">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="self" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="regexp_check" c:identifier="mruby_context_regexp_check">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="range_new" c:identifier="mruby_context_range_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo3" transfer-ownership="none">
+					<type name="gboolean" c:type="gboolean"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="define_class_id" c:identifier="mruby_context_define_class_id">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="define_module_id" c:identifier="mruby_context_define_module_id">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="vm_define_class" c:identifier="mruby_context_vm_define_class">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo3" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="vm_define_module" c:identifier="mruby_context_vm_define_module">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="define_method_raw" c:identifier="mruby_context_define_method_raw">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+				<parameter name="foo3" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="define_method_id" c:identifier="mruby_context_define_method_id">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="mid" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+				<parameter name="func" transfer-ownership="none" scope="call">
+					<type name="MRb.mrb_func" c:type="mrb_func_t"/>
+				</parameter>
+				<parameter name="aspec" transfer-ownership="none">
+					<type name="guint32" c:type="guint32"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="alias_method" c:identifier="mruby_context_alias_method">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="a" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+				<parameter name="b" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="class_outer_module" c:identifier="mruby_context_class_outer_module">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="method_search" c:identifier="mruby_context_method_search">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="gc_mark_mt" c:identifier="mruby_context_gc_mark_mt">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="gc_mark_mt_size" c:identifier="mruby_context_gc_mark_mt_size">
+			<return-value transfer-ownership="full">
+				<type name="gulong" c:type="gsize"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="gc_free_mt" c:identifier="mruby_context_gc_free_mt">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="flo_to_fixnum" c:identifier="mruby_context_flo_to_fixnum">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="val" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="float_to_str" c:identifier="mruby_context_float_to_str">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="x" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="fmt" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="to_flo" c:identifier="mruby_context_to_flo">
+			<return-value transfer-ownership="full">
+				<type name="gfloat" c:type="gfloat"/>
+			</return-value>
+			<parameters>
+				<parameter name="x" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="fixnum_plus" c:identifier="mruby_context_fixnum_plus">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="x" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="y" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="fixnum_minus" c:identifier="mruby_context_fixnum_minus">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="x" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="y" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="fixnum_mul" c:identifier="mruby_context_fixnum_mul">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="x" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="y" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="num_div" c:identifier="mruby_context_num_div">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="x" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="y" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="proc_new_cfunc" c:identifier="mruby_context_proc_new_cfunc">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" scope="call">
+					<type name="MRb.mrb_func" c:type="mrb_func_t"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="f_send" c:identifier="mruby_context_f_send">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="self" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="proc_cfunc_env_get" c:identifier="mruby_context_proc_cfunc_env_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ary_new_capa" c:identifier="mruby_context_ary_new_capa">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ary_new" c:identifier="mruby_context_ary_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Array" c:type="MRubyArray*"/>
+			</return-value>
+		</method>
+		<method name="ary_new_from_values" c:identifier="mruby_context_ary_new_from_values">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Array" c:type="MRubyArray*"/>
+			</return-value>
+			<parameters>
+				<parameter name="size" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="vals" transfer-ownership="none">
+					<array length="2">
+						<type name="MRuby.Value" c:type="MRubyValue*"/>
+					</array>
+				</parameter>
+				<parameter name="vals_length1" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="assoc_new" c:identifier="mruby_context_assoc_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="car" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="cdr" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ary_concat" c:identifier="mruby_context_ary_concat">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ary_splat" c:identifier="mruby_context_ary_splat">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ary_push" c:identifier="mruby_context_ary_push">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ary_pop" c:identifier="mruby_context_ary_pop">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="ary" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ary_ref" c:identifier="mruby_context_ary_ref">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="ary" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="n" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ary_set" c:identifier="mruby_context_ary_set">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="ary" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="n" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="val" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ary_replace" c:identifier="mruby_context_ary_replace">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="a" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="b" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="check_array_type" c:identifier="mruby_context_check_array_type">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="self" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ary_unshift" c:identifier="mruby_context_ary_unshift">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="self" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="item" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ary_shift" c:identifier="mruby_context_ary_shift">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="self" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ary_clear" c:identifier="mruby_context_ary_clear">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="self" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ary_join" c:identifier="mruby_context_ary_join">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="ary" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="sep" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="ary_resize" c:identifier="mruby_context_ary_resize">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="ary" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="len" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="hash_new" c:identifier="mruby_context_hash_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+		</method>
+		<method name="hash_set" c:identifier="mruby_context_hash_set">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="hash" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="key" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="val" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="hash_get" c:identifier="mruby_context_hash_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="hash" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="key" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="hash_fetch" c:identifier="mruby_context_hash_fetch">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="hash" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="key" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="def" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="hash_delete_key" c:identifier="mruby_context_hash_delete_key">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="hash" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="key" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="hash_keys" c:identifier="mruby_context_hash_keys">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="hash" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="check_hash_type" c:identifier="mruby_context_check_hash_type">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="hash" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="hash_empty_p" c:identifier="mruby_context_hash_empty_p">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="self" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="hash_clear" c:identifier="mruby_context_hash_clear">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="hash" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="vm_special_get" c:identifier="mruby_context_vm_special_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="vm_special_set" c:identifier="mruby_context_vm_special_set">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="vm_iv_get" c:identifier="mruby_context_vm_iv_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="vm_iv_set" c:identifier="mruby_context_vm_iv_set">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="vm_cv_get" c:identifier="mruby_context_vm_cv_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="vm_cv_set" c:identifier="mruby_context_vm_cv_set">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="vm_const_get" c:identifier="mruby_context_vm_const_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="vm_const_set" c:identifier="mruby_context_vm_const_set">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="const_get" c:identifier="mruby_context_const_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="const_set" c:identifier="mruby_context_const_set">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+				<parameter name="foo3" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="const_defined" c:identifier="mruby_context_const_defined">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="const_remove" c:identifier="mruby_context_const_remove">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="iv_p" c:identifier="mruby_context_iv_p">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="sym" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="iv_check" c:identifier="mruby_context_iv_check">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="sym" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="iv_get" c:identifier="mruby_context_iv_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="sym" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="iv_set" c:identifier="mruby_context_iv_set">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="sym" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+				<parameter name="v" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="iv_defined" c:identifier="mruby_context_iv_defined">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="iv_remove" c:identifier="mruby_context_iv_remove">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="sym" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="iv_copy" c:identifier="mruby_context_iv_copy">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="dst" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="src" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="const_defined_at" c:identifier="mruby_context_const_defined_at">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="mod" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="id" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="gv_get" c:identifier="mruby_context_gv_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="sym" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="gv_set" c:identifier="mruby_context_gv_set">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="sym" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+				<parameter name="val" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="gv_remove" c:identifier="mruby_context_gv_remove">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="sym" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="cv_get" c:identifier="mruby_context_cv_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="mod" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="sym" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="cv_set" c:identifier="mruby_context_cv_set">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="mod" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="sym" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+				<parameter name="v" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="cv_defined" c:identifier="mruby_context_cv_defined">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="mod" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="sym" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="mod_constants" c:identifier="mruby_context_mod_constants">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="mod" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="f_global_variables" c:identifier="mruby_context_f_global_variables">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="self" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="obj_instance_variables" c:identifier="mruby_context_obj_instance_variables">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="mod_class_variables" c:identifier="mruby_context_mod_class_variables">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="class_sym" c:identifier="mruby_context_class_sym">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+			</return-value>
+			<parameters>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="outer" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="gc_mark_gv" c:identifier="mruby_context_gc_mark_gv">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+		</method>
+		<method name="gc_free_gv" c:identifier="mruby_context_gc_free_gv">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+		</method>
+		<method name="define_class" c:identifier="mruby_context_define_class">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="define_module" c:identifier="mruby_context_define_module">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="singleton_class" c:identifier="mruby_context_singleton_class">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="include_module" c:identifier="mruby_context_include_module">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="define_class_method" c:identifier="mruby_context_define_class_method">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="foo3" transfer-ownership="none" scope="call">
+					<type name="MRb.mrb_func" c:type="mrb_func_t"/>
+				</parameter>
+				<parameter name="foo4" transfer-ownership="none">
+					<type name="guint32" c:type="guint32"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="define_module_function" c:identifier="mruby_context_define_module_function">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="foo3" transfer-ownership="none" scope="call">
+					<type name="MRb.mrb_func" c:type="mrb_func_t"/>
+				</parameter>
+				<parameter name="foo4" transfer-ownership="none">
+					<type name="guint32" c:type="guint32"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="define_const" c:identifier="mruby_context_define_const">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="undef_method" c:identifier="mruby_context_undef_method">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="undef_class_method" c:identifier="mruby_context_undef_class_method">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="instance_new" c:identifier="mruby_context_instance_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="cv" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="class_new" c:identifier="mruby_context_class_new">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="super" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="module_new" c:identifier="mruby_context_module_new">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+		</method>
+		<method name="class_defined" c:identifier="mruby_context_class_defined">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="class_get_under" c:identifier="mruby_context_class_get_under">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="outer" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="module_get_under" c:identifier="mruby_context_module_get_under">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="outer" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="notimplement_m" c:identifier="mruby_context_notimplement_m">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="obj_dup" c:identifier="mruby_context_obj_dup">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="check_to_integer" c:identifier="mruby_context_check_to_integer">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="val" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="method" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="obj_respond_to" c:identifier="mruby_context_obj_respond_to">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="mid" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="define_class_under" c:identifier="mruby_context_define_class_under">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="outer" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="super" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="define_module_under" c:identifier="mruby_context_define_module_under">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="outer" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="funcall_argv" c:identifier="mruby_context_funcall_argv">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+				<parameter name="foo3" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="foo4" transfer-ownership="none">
+					<array length="4">
+						<type name="MRuby.Value" c:type="MRubyValue*"/>
+					</array>
+				</parameter>
+				<parameter name="foo4_length1" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="funcall_with_block" c:identifier="mruby_context_funcall_with_block">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+				<parameter name="foo3" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="foo4" transfer-ownership="none">
+					<array length="4">
+						<type name="MRuby.Value" c:type="MRubyValue*"/>
+					</array>
+				</parameter>
+				<parameter name="foo4_length1" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="foo5" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="intern_cstr" c:identifier="mruby_context_intern_cstr">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="intern" c:identifier="mruby_context_intern">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="intern_static" c:identifier="mruby_context_intern_static">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="intern_str" c:identifier="mruby_context_intern_str">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="check_intern_cstr" c:identifier="mruby_context_check_intern_cstr">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="check_intern" c:identifier="mruby_context_check_intern">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="check_intern_str" c:identifier="mruby_context_check_intern_str">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="sym2name" c:identifier="mruby_context_sym2name">
+			<return-value transfer-ownership="full">
+				<type name="utf8" c:type="gchar*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="sym2str" c:identifier="mruby_context_sym2str">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="malloc" c:identifier="mruby_context_malloc">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="calloc" c:identifier="mruby_context_calloc">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="realloc" c:identifier="mruby_context_realloc">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="realloc_simple" c:identifier="mruby_context_realloc_simple">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="malloc_simple" c:identifier="mruby_context_malloc_simple">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="free" c:identifier="mruby_context_free">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_new" c:identifier="mruby_context_str_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="p" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="len" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_new_cstr" c:identifier="mruby_context_str_new_cstr">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.String" c:type="MRubyString*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="str_new_static" c:identifier="mruby_context_str_new_static">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="p" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="len" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="close" c:identifier="mruby_context_close">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+		</method>
+		<method name="default_allocf" c:identifier="mruby_context_default_allocf">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+				<parameter name="foo3" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="top_self" c:identifier="mruby_context_top_self">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+		</method>
+		<method name="run" c:identifier="mruby_context_run">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="toplevel_run" c:identifier="mruby_context_toplevel_run">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="p" c:identifier="mruby_context_p">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="obj_to_sym" c:identifier="mruby_context_obj_to_sym">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+			</return-value>
+			<parameters>
+				<parameter name="name" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="obj_eq" c:identifier="mruby_context_obj_eq">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="obj_equal" c:identifier="mruby_context_obj_equal">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="foo2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="equal" c:identifier="mruby_context_equal">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="obj2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="Integer" c:identifier="mruby_context_Integer">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="val" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="Float" c:identifier="mruby_context_Float">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="val" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="inspect" c:identifier="mruby_context_inspect">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="eql" c:identifier="mruby_context_eql">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj1" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="obj2" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="garbage_collect" c:identifier="mruby_context_garbage_collect">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+		</method>
+		<method name="full_gc" c:identifier="mruby_context_full_gc">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+		</method>
+		<method name="incremental_gc" c:identifier="mruby_context_incremental_gc">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+		</method>
+		<method name="any_to_s" c:identifier="mruby_context_any_to_s">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="obj_classname" c:identifier="mruby_context_obj_classname">
+			<return-value transfer-ownership="full">
+				<type name="utf8" c:type="gchar*"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="obj_class" c:identifier="mruby_context_obj_class">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="class_path" c:identifier="mruby_context_class_path">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="obj_is_kind_of" c:identifier="mruby_context_obj_is_kind_of">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="obj_inspect" c:identifier="mruby_context_obj_inspect">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="self" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="obj_clone" c:identifier="mruby_context_obj_clone">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="self" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="exc_new" c:identifier="mruby_context_exc_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="ptr" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="len" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="print_backtrace" c:identifier="mruby_context_print_backtrace">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+		</method>
+		<method name="print_error" c:identifier="mruby_context_print_error">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+		</method>
+		<method name="yield" c:identifier="mruby_context_yield">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="b" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="arg" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="yield_argv" c:identifier="mruby_context_yield_argv">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="b" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="argc" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="argv" transfer-ownership="none">
+					<array length="3">
+						<type name="MRuby.Value" c:type="MRubyValue*"/>
+					</array>
+				</parameter>
+				<parameter name="argv_length1" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="yield_with_class" c:identifier="mruby_context_yield_with_class">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="b" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="argc" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="argv" transfer-ownership="none">
+					<array length="3">
+						<type name="MRuby.Value" c:type="MRubyValue*"/>
+					</array>
+				</parameter>
+				<parameter name="argv_length1" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="self" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="gc_protect" c:identifier="mruby_context_gc_protect">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="to_int" c:identifier="mruby_context_to_int">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="val" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="define_alias" c:identifier="mruby_context_define_alias">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="klass" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+				<parameter name="name1" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="name2" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="class_name" c:identifier="mruby_context_class_name">
+			<return-value transfer-ownership="full">
+				<type name="utf8" c:type="gchar*"/>
+			</return-value>
+			<parameters>
+				<parameter name="klass" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="define_global_const" c:identifier="mruby_context_define_global_const">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="name" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+				<parameter name="val" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="attr_get" c:identifier="mruby_context_attr_get">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="id" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="respond_to" c:identifier="mruby_context_respond_to">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="mid" transfer-ownership="none">
+					<type name="MRuby.Symbol" c:type="MRubySymbol"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="obj_is_instance_of" c:identifier="mruby_context_obj_is_instance_of">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="obj" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="c" transfer-ownership="none" allow-none="1">
+					<type name="gpointer" c:type="void*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="fiber_resume" c:identifier="mruby_context_fiber_resume">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="fib" transfer-ownership="none">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</parameter>
+				<parameter name="argc" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="argv" transfer-ownership="none">
+					<array length="3">
+						<type name="MRuby.Value" c:type="MRubyValue*"/>
+					</array>
+				</parameter>
+				<parameter name="argv_length1" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="fiber_yield" c:identifier="mruby_context_fiber_yield">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Object" c:type="MRubyObject*"/>
+			</return-value>
+			<parameters>
+				<parameter name="argc" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="argv" transfer-ownership="none">
+					<array length="2">
+						<type name="MRuby.Value" c:type="MRubyValue*"/>
+					</array>
+				</parameter>
+				<parameter name="argv_length1" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="alloca" c:identifier="mruby_context_alloca">
+			<return-value transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</return-value>
+			<parameters>
+				<parameter name="foo1" transfer-ownership="none">
+					<type name="gulong" c:type="gsize"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="show_version" c:identifier="mruby_context_show_version">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+		</method>
+		<method name="show_copyright" c:identifier="mruby_context_show_copyright">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+		</method>
+		<constructor name="new" c:identifier="mruby_context_new">
+			<return-value transfer-ownership="full">
+				<type name="MRuby.Context" c:type="MRubyContext*"/>
+			</return-value>
+		</constructor>
+		<property name="-base-">
+			<type name="MRb.Context" c:type="mrb_state*"/>
+		</property>
+		<method name="get__base_" c:identifier="mruby_context_get__base_">
+			<return-value transfer-ownership="none">
+				<type name="MRb.Context" c:type="mrb_state*"/>
+			</return-value>
+		</method>
+	</record>
+	<record name="Symbol">
+	</record>
+	<callback name="FuncCB" c:type="MRubyFuncCB">
+		<return-value transfer-ownership="none" allow-none="1">
+			<type name="GObject.Value" c:type="GValue*"/>
+		</return-value>
+		<parameters>
+			<parameter name="mrb" transfer-ownership="none">
+				<type name="MRuby.Context" c:type="MRubyContext*"/>
+			</parameter>
+			<parameter name="self" transfer-ownership="none">
+				<type name="MRuby.Value" c:type="MRubyValue*"/>
+			</parameter>
+			<parameter name="user_data" transfer-ownership="none" closure="2">
+				<type name="gpointer" c:type="void*"/>
+			</parameter>
+		</parameters>
+	</callback>
+	<function name="cptr" c:identifier="mruby_cptr">
+		<return-value transfer-ownership="none" allow-none="1">
+			<type name="gpointer" c:type="void*"/>
+		</return-value>
+		<parameters>
+			<parameter name="val" transfer-ownership="none">
+				<type name="MRuby.Value" c:type="MRubyValue*"/>
+			</parameter>
+		</parameters>
+	</function>
+	<function name="nil_value" c:identifier="mruby_nil_value">
+		<return-value transfer-ownership="full">
+			<type name="MRuby.Value" c:type="MRubyValue*"/>
+		</return-value>
+	</function>
+	<function name="true_value" c:identifier="mruby_true_value">
+		<return-value transfer-ownership="full">
+			<type name="MRuby.Value" c:type="MRubyValue*"/>
+		</return-value>
+	</function>
+	<function name="false_value" c:identifier="mruby_false_value">
+		<return-value transfer-ownership="full">
+			<type name="MRuby.Value" c:type="MRubyValue*"/>
+		</return-value>
+	</function>
+	<function name="bool_value" c:identifier="mruby_bool_value">
+		<return-value transfer-ownership="full">
+			<type name="MRuby.Value" c:type="MRubyValue*"/>
+		</return-value>
+		<parameters>
+			<parameter name="val" transfer-ownership="none">
+				<type name="gboolean" c:type="gboolean"/>
+			</parameter>
+		</parameters>
+	</function>
+	<function name="fixnum_value" c:identifier="mruby_fixnum_value">
+		<return-value transfer-ownership="full">
+			<type name="MRuby.Value" c:type="MRubyValue*"/>
+		</return-value>
+		<parameters>
+			<parameter name="val" transfer-ownership="none">
+				<type name="gint" c:type="gint"/>
+			</parameter>
+		</parameters>
+	</function>
+	<function name="obj_ptr" c:identifier="mruby_obj_ptr">
+		<return-value transfer-ownership="none" allow-none="1">
+			<type name="gpointer" c:type="void*"/>
+		</return-value>
+		<parameters>
+			<parameter name="obj" transfer-ownership="none">
+				<type name="MRuby.Value" c:type="MRubyValue*"/>
+			</parameter>
+		</parameters>
+	</function>
+	<function name="class_ptr" c:identifier="mruby_class_ptr">
+		<return-value transfer-ownership="none" allow-none="1">
+			<type name="gpointer" c:type="void*"/>
+		</return-value>
+		<parameters>
+			<parameter name="kls" transfer-ownership="none">
+				<type name="MRuby.Value" c:type="MRubyValue*"/>
+			</parameter>
+		</parameters>
+	</function>
+	<function name="fixnum" c:identifier="mruby_fixnum">
+		<return-value transfer-ownership="full">
+			<type name="gint" c:type="gint"/>
+		</return-value>
+		<parameters>
+			<parameter name="v" transfer-ownership="none">
+				<type name="MRuby.Value" c:type="MRubyValue*"/>
+			</parameter>
+		</parameters>
+	</function>
+	<function name="test" c:identifier="mruby_test">
+		<return-value transfer-ownership="full">
+			<type name="gboolean" c:type="gboolean"/>
+		</return-value>
+		<parameters>
+			<parameter name="v" transfer-ownership="none">
+				<type name="MRuby.Value" c:type="MRubyValue*"/>
+			</parameter>
+		</parameters>
+	</function>
+	<function name="type" c:identifier="mruby_type">
+		<return-value transfer-ownership="full">
+			<type name="MRuby.TT" c:type="MRubyTT"/>
+		</return-value>
+		<parameters>
+			<parameter name="v" transfer-ownership="none">
+				<type name="MRuby.Value" c:type="MRubyValue*"/>
+			</parameter>
+		</parameters>
+	</function>
+	<function name="nil_p" c:identifier="mruby_nil_p">
+		<return-value transfer-ownership="none" allow-none="1">
+			<type name="gpointer" c:type="void*"/>
+		</return-value>
+		<parameters>
+			<parameter name="v" transfer-ownership="none">
+				<type name="MRuby.Value" c:type="MRubyValue*"/>
+			</parameter>
+		</parameters>
+	</function>
+	<function name="mrb2vary" c:identifier="mruby_mrb2vary">
+		<return-value transfer-ownership="full">
+			<array length="3">
+				<type name="MRuby.Value" c:type="MRubyValue*"/>
+			</array>
+		</return-value>
+		<parameters>
+			<parameter name="m" transfer-ownership="none">
+				<array length="1">
+					<type name="MRb.Value" c:type="mrb_value"/>
+				</array>
+			</parameter>
+			<parameter name="m_length1" transfer-ownership="none">
+				<type name="gint" c:type="gint"/>
+			</parameter>
+			<parameter name="a" transfer-ownership="none" allow-none="1">
+				<type name="gint" c:type="gint*"/>
+			</parameter>
+			<parameter name="result_length1" direction="out" transfer-ownership="none">
+				<type name="gint" c:type="gint*"/>
+			</parameter>
+		</parameters>
+	</function>
+	<function name="vary2mrb" c:identifier="mruby_vary2mrb">
+		<return-value transfer-ownership="full">
+			<array length="2">
+				<type name="MRb.Value" c:type="mrb_value"/>
+			</array>
+		</return-value>
+		<parameters>
+			<parameter name="a" transfer-ownership="none">
+				<array length="1">
+					<type name="MRuby.Value" c:type="MRubyValue*"/>
+				</array>
+			</parameter>
+			<parameter name="a_length1" transfer-ownership="none">
+				<type name="gint" c:type="gint"/>
+			</parameter>
+			<parameter name="result_length1" direction="out" transfer-ownership="none">
+				<type name="gint" c:type="gint*"/>
+			</parameter>
+		</parameters>
+	</function>
+	<function name="mrb2gval" c:identifier="mruby_mrb2gval">
+		<return-value transfer-ownership="full" allow-none="1">
+			<type name="GObject.Value" c:type="GValue*"/>
+		</return-value>
+		<parameters>
+			<parameter name="mrb" transfer-ownership="none">
+				<type name="MRuby.Context" c:type="MRubyContext*"/>
+			</parameter>
+			<parameter name="m" transfer-ownership="none">
+				<type name="MRuby.Value" c:type="MRubyValue*"/>
+			</parameter>
+		</parameters>
+	</function>
+	<function name="gval2mrb" c:identifier="mruby_gval2mrb">
+		<return-value transfer-ownership="full" allow-none="1">
+			<type name="MRuby.Value" c:type="MRubyValue*"/>
+		</return-value>
+		<parameters>
+			<parameter name="mrb" transfer-ownership="none">
+				<type name="MRuby.Context" c:type="MRubyContext*"/>
+			</parameter>
+			<parameter name="val" transfer-ownership="none" allow-none="1">
+				<type name="GObject.Value" c:type="GValue*"/>
+			</parameter>
+		</parameters>
+	</function>
+	<function name="obj_value" c:identifier="mruby_obj_value">
+		<return-value transfer-ownership="full">
+			<type name="MRuby.Object" c:type="MRubyObject*"/>
+		</return-value>
+		<parameters>
+			<parameter name="obj" transfer-ownership="none" allow-none="1">
+				<type name="gpointer" c:type="void*"/>
+			</parameter>
+		</parameters>
+	</function>
+</namespace>
+</repository>

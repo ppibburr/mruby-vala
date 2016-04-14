@@ -8,6 +8,25 @@ namespace MRuby {
       }
     }
   
+    public MRuby.Value[] args(out int len) {
+	  MRb.Value* a;
+	  int ac = 0;
+	  MRb.Value b;
+	  get_args("*&", out a, out ac, out b);
+	  
+	  var args = new MRuby.Value[ac+1];
+	  
+	  for (var i=0; i < ac; i++) {
+		  args[i] = new MRuby.Value(((MRb.Value[])a)[i], this);
+	  }
+	  
+	  args[ac] = new MRuby.Value(b, this);
+	  
+	  len = ac+1;
+	  
+	  return args;
+	}
+  
     public new void define_method(string name, FuncCB cb) {
       new Class(object_class).define_method(this, name, cb);
     }
