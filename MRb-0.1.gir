@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 <repository version="1.2" xmlns="http://www.gtk.org/introspection/core/1.0" xmlns:c="http://www.gtk.org/introspection/c/1.0" xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
-<package name="MRb"/>
+<package name="mruby-shared"/>
 <c:include name="mruby.h"/>
 <namespace name="MRb" version="0.1" c:prefix="mrb">
   <record name="Value">
 	</record>
+  <record name="Context">
+	</record>	
 </namespace>
 </repository>

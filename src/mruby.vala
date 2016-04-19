@@ -96,9 +96,36 @@ namespace MRuby {
 	  MAXDEFINE;    /*  23 */
 	}
   
+<<<<<<< HEAD
+  public static MRuby.Value[] get_args(MRuby.Context mrb, out int len) {
+      unowned MRb.Value* a;
+      MRb.Value b;
+      int ac;
+	  
+	  mrb.get_args("*&",out a, out ac, out b);
+	  len = ac+1;
+	  
+	  var blk = new MRuby.Value(b, mrb);
+	  var c = 0;
+	  var q = new MRuby.Value?[len];
+      
+      for(var t=0; t < ac; t++) {
+		  q[c] = new MRuby.Value(((MRb.Value[])a)[t], mrb);
+		  c++;
+	  }
+	  
+	  q[len-1] = blk;
+	  
+	  return q;
+  }
+  
+  public static unowned GLib.Value? mrb2gval(Context mrb, MRuby.Value m) {
+	  switch (type(m)) {
+=======
   public static GLib.Value? mrb2gval(Context mrb, MRuby.Value m) {
 	  print(@"$(type(m)+1)\n");
 	  switch (type(m)+1) {
+>>>>>>> 1a0181fd54bde3fd4217e9ddb1c9ed6f5f9d3fbf
 	  case TT.STRING:
       return (string)mrb.str_to_cstr(m);
 	  case TT.FIXNUM:
@@ -154,6 +181,7 @@ namespace MRuby {
       return mrb.str_new_cstr((string)val);
       
     } else {
+			  print(@"$(val.type())");
       print("%s not converted.\n", val.type().name());
       return nil_value();
     }
@@ -172,6 +200,10 @@ namespace MRuby {
     public string to_string(MRuby.Context? c = null) {
 		unowned MRuby.Context mc = get_context(c);
 		return (string)mc.str_to_cstr(mc.obj_as_string(this)); 
+	}
+   
+    public bool has_context() {
+		return mrb != null;
 	}
    
     public unowned MRuby.Context? get_context(MRuby.Context? c) {
