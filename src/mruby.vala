@@ -96,7 +96,6 @@ namespace MRuby {
 	  MAXDEFINE;    /*  23 */
 	}
   
-<<<<<<< HEAD
   public static MRuby.Value[] get_args(MRuby.Context mrb, out int len) {
       unowned MRb.Value* a;
       MRb.Value b;
@@ -119,20 +118,15 @@ namespace MRuby {
 	  return q;
   }
   
-  public static unowned GLib.Value? mrb2gval(Context mrb, MRuby.Value m) {
-	  switch (type(m)) {
-=======
   public static GLib.Value? mrb2gval(Context mrb, MRuby.Value m) {
-	  print(@"$(type(m)+1)\n");
-	  switch (type(m)+1) {
->>>>>>> 1a0181fd54bde3fd4217e9ddb1c9ed6f5f9d3fbf
-	  case TT.STRING:
+	switch (type(m)+1) {
+    case TT.STRING:
       return (string)mrb.str_to_cstr(m);
-	  case TT.FIXNUM:
+	case TT.FIXNUM:
       return fixnum(m);
-	  case TT.FLOAT:
+	case TT.FLOAT:
       return mrb.to_flo(m);
-	  case TT.TRUE:
+	case TT.TRUE:
       return true;
     case TT.FALSE:
       if (nil_p(m) != null) {
@@ -142,7 +136,6 @@ namespace MRuby {
       return null;
       
     case TT.OBJECT:
-      print("OBJECT\n");
       return (MRuby.Object)m;
     case TT.ARRAY:
       return (MRuby.Array)m; 
