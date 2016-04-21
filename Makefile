@@ -1,5 +1,4 @@
 all:
-	make mruby
 	make compile
 	make gir
 
@@ -18,13 +17,21 @@ clean:
 	rm MRuby-0.1.gir
 	
 install:
-	sudo mkdir -p /usr/share/vala/vapi/
-	sudo cp *.so /usr/lib/
-	sudo cp *.typelib /usr/lib/girepository-1.0/
-	sudo cp *.vapi /usr/share/vala/vapi/
-	sudo cp vapi/*.vapi /usr/share/vala/vapi/	
-	sudo cp mruby-vala.pc /usr/lib/pkgconfig/
-	sudo cp *.h /usr/include/
-
+	mkdir -p /usr/share/vala/vapi/
+	cp *.so /usr/lib/
+	cp *.typelib /usr/lib/girepository-1.0/
+	cp *.vapi /usr/share/vala/vapi/
+	cp vapi/*.vapi /usr/share/vala/vapi/	
+	cp mruby-vala.pc /usr/lib/pkgconfig/
+	cp *.h /usr/include/
+    
 mruby:
 	./mruby.sh
+	
+mrb_clean:
+	rm -rf vendor
+
+deb:
+	make mruby
+	make all
+	make install
