@@ -5,6 +5,15 @@ Provides a .vapi file at ./vapi/mruby.vapi to bind mruby to Vala (can be re-gene
 
 Provides a Shared Library exposing a more intuitive API to mruby (and to bind to other languages via GObjectIntospection)
 
+Dependencies
+===
+* [girepository](http://live.gnome.org/GObjectIntrospection)
+
+Ubuntu:  
+---
+Install gobject-introspection
+`sudo apt-get install libgirepository1.0-dev`
+
 Example
 ===
 ```vala
@@ -24,7 +33,8 @@ INSTALL
 ```bash
 # clones and builds mruby into ./vender/mruby
 # installs mruby to prefix /usr
-# any mruby will work as long as compiled with -fPIC
+sudo make mruby
+
 #
 # builds library, gir, typelib
 make
@@ -32,6 +42,13 @@ make
 # installs mruby-vala to prefix /usr
 make install
 ```
+
+alternatively `mruby-vala` .debs provided here  
+
+* [Ubuntu 15.10 amd64](https://github.com/ppibburr/ppibburr.github.com/raw/master/mruby-vala_0.1-1_amd64.deb) 
+* [Ubuntu 15.10 x86](https://github.com/ppibburr/ppibburr.github.com/raw/master/mruby-vala_0.1-1_i386.deb)
+
+
 
 USING
 ===
