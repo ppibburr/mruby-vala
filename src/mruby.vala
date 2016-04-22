@@ -40,7 +40,7 @@ namespace MRuby {
   }
   
   public static TT type(Value v) {
-    return (TT)(MRb.type(v.actual) - 1);
+    return (TT)(MRb.type(v.actual));
   }
   
   public static void* nil_p(Value v) {
